@@ -13,7 +13,6 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 object DatabaseModule {
-    /** Build the persistent database once its Room schema is defined. */
     @Provides
     @Singleton
     fun provideMedusDatabase(@ApplicationContext context: Context): MedusDatabase =

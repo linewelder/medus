@@ -24,6 +24,7 @@ ksp {
 }
 
 dependencies {
+    implementation(project(":core:model"))
     api(libs.androidx.room.runtime)
     implementation(libs.hilt.android)
     ksp(libs.androidx.room.compiler)

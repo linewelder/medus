@@ -1,4 +1,4 @@
-package io.github.linewelder.medus.core.database
+package io.github.linewelder.medus.core.model
 
 import java.util.*
 
