@@ -5,13 +5,25 @@ import io.github.linewelder.medus.core.model.*
 import kotlinx.coroutines.flow.*
 import java.util.*
 
-@Entity(tableName = "tasks")
+@Entity(
+    tableName = "tasks",
+    foreignKeys = [
+        ForeignKey(
+            entity = AreaEntity::class,
+            parentColumns = ["id"],
+            childColumns = ["areaId"],
+            onDelete = ForeignKey.RESTRICT,
+        ),
+    ],
+    indices = [Index("areaId")],
+)
 data class TaskEntity(
     @PrimaryKey
     val id: Id<Task>,
     val title: String,
     val dateCreated: Date,
     val completed: Boolean,
+    val areaId: Id<Area>? = null,
 )
 
 @Dao

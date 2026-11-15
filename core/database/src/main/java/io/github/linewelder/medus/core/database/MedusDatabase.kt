@@ -4,7 +4,13 @@ import androidx.room.*
 import io.github.linewelder.medus.core.database.converters.*
 import io.github.linewelder.medus.core.database.model.*
 
-@Database(entities = [TaskEntity::class], version = 1)
+@Database(
+    entities = [
+        TaskEntity::class,
+        AreaEntity::class,
+    ],
+    version = 2,
+)
 @TypeConverters(
     DateConverter::class,
 )

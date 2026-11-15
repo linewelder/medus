@@ -7,4 +7,5 @@ data class Task(
     val title: String,
     val dateCreated: Date,
     val completed: Boolean,
+    val areaId: Id<Area>? = null,
 )

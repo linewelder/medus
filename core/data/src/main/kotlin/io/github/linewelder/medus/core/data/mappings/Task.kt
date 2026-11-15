@@ -9,4 +9,5 @@ fun TaskEntity.asExternalModel() =
         title = title,
         dateCreated = dateCreated,
         completed = completed,
+        areaId = areaId,
     )
