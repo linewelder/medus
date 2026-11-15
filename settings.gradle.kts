@@ -25,3 +25,5 @@ dependencyResolutionManagement {
 rootProject.name = "Medus"
 include(":app")
 include(":core:database")
+include(":core:data")
+include(":core:model")

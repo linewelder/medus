@@ -1,4 +1,5 @@
 package io.github.linewelder.medus.core.database
 
-class MedusDatabase {
-}
+import androidx.room.RoomDatabase
+
+abstract class MedusDatabase : RoomDatabase()
