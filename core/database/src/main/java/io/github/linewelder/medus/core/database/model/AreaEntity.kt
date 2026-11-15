@@ -1,9 +1,8 @@
 package io.github.linewelder.medus.core.database.model
 
-import androidx.room.Entity
-import androidx.room.PrimaryKey
-import io.github.linewelder.medus.core.model.Area
-import io.github.linewelder.medus.core.model.Id
+import androidx.room.*
+import io.github.linewelder.medus.core.model.*
+import kotlinx.coroutines.flow.*
 
 @Entity(tableName = "areas")
 data class AreaEntity(
@@ -11,3 +10,12 @@ data class AreaEntity(
     val id: Id<Area>,
     val name: String,
 )
+
+@Dao
+interface AreaDao {
+    @Query("SELECT * FROM areas ORDER BY name COLLATE NOCASE, id")
+    fun getAllAreas(): Flow<List<AreaEntity>>
+
+    @Insert
+    suspend fun insert(area: AreaEntity)
+}

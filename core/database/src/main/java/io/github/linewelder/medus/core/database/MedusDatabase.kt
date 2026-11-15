@@ -16,4 +16,5 @@ import io.github.linewelder.medus.core.database.model.*
 )
 abstract class MedusDatabase : RoomDatabase() {
     abstract fun taskDao(): TaskDao
+    abstract fun areaDao(): AreaDao
 }

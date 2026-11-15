@@ -30,4 +30,7 @@ data class TaskEntity(
 interface TaskDao {
     @Query("SELECT * FROM tasks ORDER BY dateCreated DESC, id DESC")
     fun getAllTasks(): Flow<List<TaskEntity>>
+
+    @Insert
+    suspend fun insert(task: TaskEntity)
 }
