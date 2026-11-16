@@ -29,9 +29,14 @@ private fun HomeScreenContent(calendarContent: @Composable (Modifier) -> Unit) {
 @Preview
 @Composable
 private fun HomeScreenPreview() {
-    val events = listOf(
-        CalendarEvent("School holiday", start = 0L, end = 86_400_000L, allDay = true),
-        CalendarEvent("Pick up groceries", start = 36_000_000L, end = 39_600_000L, allDay = false),
+    val events = CalendarEventDays(
+        today = listOf(
+            CalendarEvent("School holiday", start = 0L, end = 86_400_000L, allDay = true),
+            CalendarEvent("Pick up groceries", start = 36_000_000L, end = 39_600_000L, allDay = false),
+        ),
+        tomorrow = listOf(
+            CalendarEvent("Dentist appointment", start = 122_400_000L, end = 124_200_000L, allDay = false),
+        ),
     )
 
     MedusTheme(dynamicColor = false) {

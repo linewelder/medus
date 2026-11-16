@@ -58,43 +58,60 @@ internal fun DeviceCalendarEventList(
 /** Render the calendar list for the supplied permission, loading, and event data. */
 @Composable
 internal fun CalendarEventList(
-    events: List<CalendarEvent>?,
+    events: CalendarEventDays?,
     hasCalendarAccess: Boolean,
     loading: Boolean,
     onRequestCalendarAccess: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val context = LocalContext.current
-    LazyColumn(
-        modifier = modifier,
-        contentPadding = PaddingValues(16.dp),
-        verticalArrangement = Arrangement.spacedBy(12.dp),
-    ) {
-        item {
-            Text(stringResource(R.string.home_today_events), style = MaterialTheme.typography.titleLarge)
-        }
-        when {
-            !hasCalendarAccess -> item {
-                Column {
-                    Text(stringResource(R.string.home_calendar_permission))
-                    Button(onClick = onRequestCalendarAccess) {
-                        Text(stringResource(R.string.home_allow_calendar_access))
-                    }
-                }
+    when {
+        !hasCalendarAccess -> Column {
+            Text(stringResource(R.string.home_calendar_permission))
+            Button(onClick = onRequestCalendarAccess) {
+                Text(stringResource(R.string.home_allow_calendar_access))
             }
-            loading -> item { CircularProgressIndicator() }
-            events == null -> item { Text(stringResource(R.string.home_calendar_unavailable)) }
-            events.isEmpty() -> item { Text(stringResource(R.string.home_no_events)) }
-            else -> items(events) { event ->
-                val timeFrame = if (event.allDay) {
-                    stringResource(R.string.home_all_day)
-                } else {
-                    DateUtils.formatDateRange(context, event.start, event.end, DateUtils.FORMAT_SHOW_TIME)
-                }
-                Column {
-                    Text(event.title ?: stringResource(R.string.home_untitled_event))
-                    Text(timeFrame, style = MaterialTheme.typography.bodySmall)
-                }
+        }
+
+        loading -> CircularProgressIndicator()
+
+        events == null -> Text(stringResource(R.string.home_calendar_unavailable))
+
+        else -> LazyColumn(
+            modifier = modifier,
+            contentPadding = PaddingValues(16.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp),
+        ) {
+            item {
+                Text(stringResource(R.string.home_today_events), style = MaterialTheme.typography.titleLarge)
+            }
+            calendarEventRows(events.today, R.string.home_no_events)
+
+            item {
+                Text(
+                    stringResource(R.string.home_tomorrow_events),
+                    modifier = Modifier.padding(top = 8.dp),
+                    style = MaterialTheme.typography.titleLarge,
+                )
+            }
+            calendarEventRows(events.tomorrow, R.string.home_no_tomorrow_events)
+        }
+    }
+}
+
+/** Add the day's event rows or its empty message to the shared list. */
+private fun LazyListScope.calendarEventRows(events: List<CalendarEvent>, emptyMessage: Int) {
+    if (events.isEmpty()) {
+        item { Text(stringResource(emptyMessage)) }
+    } else {
+        items(events) { event ->
+            val timeFrame = if (event.allDay) {
+                stringResource(R.string.home_all_day)
+            } else {
+                DateUtils.formatDateRange(LocalContext.current, event.start, event.end, DateUtils.FORMAT_SHOW_TIME)
+            }
+            Column {
+                Text(event.title ?: stringResource(R.string.home_untitled_event))
+                Text(timeFrame, style = MaterialTheme.typography.bodySmall)
             }
         }
     }

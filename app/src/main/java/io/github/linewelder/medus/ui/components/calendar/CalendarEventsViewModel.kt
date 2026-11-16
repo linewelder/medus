@@ -8,13 +8,13 @@ import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import javax.inject.*
 
-/** The current result of reading today's calendar. */
+/** The current result of reading the upcoming calendar events. */
 internal data class CalendarEventsState(
     val loading: Boolean = true,
-    val events: List<CalendarEvent>? = null,
+    val events: CalendarEventDays? = null,
 )
 
-/** Load today's calendar events off the main thread and expose the result to the UI. */
+/** Load upcoming calendar events off the main thread and expose the result to the UI. */
 @HiltViewModel
 internal class CalendarEventsViewModel @Inject constructor(
     @param:ApplicationContext private val context: Context,
@@ -30,7 +30,7 @@ internal class CalendarEventsViewModel @Inject constructor(
         refreshJob = if (hasCalendarAccess) {
             viewModelScope.launch {
                 val events = withContext(Dispatchers.IO) {
-                    readTodayCalendarEvents(context.contentResolver)
+                    readCalendarEventDays(context.contentResolver)
                 }
                 calendarState.value = CalendarEventsState(loading = false, events = events)
             }
