@@ -1,4 +1,4 @@
-package io.github.linewelder.medus.ui.edittask
+package io.github.linewelder.medus.ui.screens.edittask
 
 import android.database.sqlite.SQLiteException
 import androidx.lifecycle.*

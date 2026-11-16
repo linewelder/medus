@@ -2,9 +2,9 @@ package io.github.linewelder.medus.ui
 
 import androidx.compose.runtime.*
 import androidx.navigation.compose.*
-import io.github.linewelder.medus.ui.createtask.*
-import io.github.linewelder.medus.ui.edittask.*
-import io.github.linewelder.medus.ui.alltasks.*
+import io.github.linewelder.medus.ui.screens.alltasks.*
+import io.github.linewelder.medus.ui.screens.createtask.*
+import io.github.linewelder.medus.ui.screens.edittask.*
 import kotlinx.serialization.*
 
 @Composable

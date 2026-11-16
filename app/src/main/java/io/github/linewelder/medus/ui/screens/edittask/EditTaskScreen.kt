@@ -1,4 +1,4 @@
-package io.github.linewelder.medus.ui.edittask
+package io.github.linewelder.medus.ui.screens.edittask
 
 import androidx.activity.compose.*
 import androidx.compose.foundation.*
@@ -17,7 +17,7 @@ import androidx.lifecycle.compose.*
 import io.github.linewelder.medus.R
 import io.github.linewelder.medus.core.model.*
 import io.github.linewelder.medus.ui.components.*
-import io.github.linewelder.medus.ui.edittask.EditTaskViewModel.*
+import io.github.linewelder.medus.ui.screens.edittask.EditTaskViewModel.*
 import io.github.linewelder.medus.ui.theme.*
 import java.util.*
 

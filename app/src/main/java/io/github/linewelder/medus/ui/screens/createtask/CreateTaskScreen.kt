@@ -1,4 +1,4 @@
-package io.github.linewelder.medus.ui.createtask
+package io.github.linewelder.medus.ui.screens.createtask
 
 import androidx.activity.compose.*
 import androidx.compose.foundation.*
@@ -15,7 +15,7 @@ import androidx.lifecycle.compose.*
 import io.github.linewelder.medus.R
 import io.github.linewelder.medus.core.model.*
 import io.github.linewelder.medus.ui.components.*
-import io.github.linewelder.medus.ui.createtask.CreateTaskViewModel.*
+import io.github.linewelder.medus.ui.screens.createtask.CreateTaskViewModel.*
 import io.github.linewelder.medus.ui.theme.*
 
 /** Display a task form with a choice of an existing area or an inline area name. */

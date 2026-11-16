@@ -1,4 +1,4 @@
-package io.github.linewelder.medus.ui.alltasks
+package io.github.linewelder.medus.ui.screens.alltasks
 
 import androidx.lifecycle.*
 import dagger.hilt.android.lifecycle.*
