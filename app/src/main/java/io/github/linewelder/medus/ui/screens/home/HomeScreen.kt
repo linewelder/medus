@@ -4,12 +4,45 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.*
-import androidx.compose.ui.res.*
-import io.github.linewelder.medus.R
+import androidx.compose.ui.tooling.preview.*
+import io.github.linewelder.medus.ui.components.calendar.*
+import io.github.linewelder.medus.ui.theme.*
 
 @Composable
 fun HomeScreen() {
-    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-        Text(stringResource(R.string.home_greeting))
+    HomeScreenContent { modifier -> DeviceCalendarEventList(modifier) }
+}
+
+/** Apply the screen background and system insets to the home content. */
+@Composable
+private fun HomeScreenContent(calendarContent: @Composable (Modifier) -> Unit) {
+    Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
+        calendarContent(
+            Modifier
+                .fillMaxSize()
+                .padding(innerPadding)
+                .consumeWindowInsets(innerPadding),
+        )
+    }
+}
+
+@Preview
+@Composable
+private fun HomeScreenPreview() {
+    val events = listOf(
+        CalendarEvent("School holiday", start = 0L, end = 86_400_000L, allDay = true),
+        CalendarEvent("Pick up groceries", start = 36_000_000L, end = 39_600_000L, allDay = false),
+    )
+
+    MedusTheme(dynamicColor = false) {
+        HomeScreenContent { modifier ->
+            CalendarEventList(
+                events = events,
+                hasCalendarAccess = true,
+                loading = false,
+                onRequestCalendarAccess = {},
+                modifier = modifier,
+            )
+        }
     }
 }

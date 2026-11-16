@@ -1,7 +1,13 @@
 <resources>
     <string name="app_name">Medus</string>
     <string name="home">Home</string>
-    <string name="home_greeting">hello</string>
+    <string name="home_today_events">Today’s events</string>
+    <string name="home_calendar_permission">Allow calendar access to see today’s events.</string>
+    <string name="home_allow_calendar_access">Allow calendar access</string>
+    <string name="home_calendar_unavailable">Couldn’t read the calendar.</string>
+    <string name="home_no_events">No events today.</string>
+    <string name="home_all_day">All day</string>
+    <string name="home_untitled_event">Untitled event</string>
     <string name="all_tasks">All Tasks</string>
     <string name="area_filter">Area</string>
     <string name="all_areas">All</string>
