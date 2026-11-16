@@ -1,4 +1,4 @@
-package io.github.linewelder.medus.ui.home
+package io.github.linewelder.medus.ui.alltasks
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.*
@@ -18,14 +18,14 @@ import io.github.linewelder.medus.ui.theme.*
 import java.util.*
 
 @Composable
-fun HomeScreen(
+fun AllTasksScreen(
     onCreateTask: () -> Unit,
     onEditTask: (Id<Task>) -> Unit,
-    viewModel: HomeViewModel = hiltViewModel(),
+    viewModel: AllTasksViewModel = hiltViewModel(),
 ) {
     val tasks by viewModel.tasks.collectAsStateWithLifecycle(initialValue = emptyList())
     val areas by viewModel.areas.collectAsStateWithLifecycle(initialValue = emptyList())
-    HomeScreenContent(
+    AllTasksScreenContent(
         tasks,
         areas,
         onCreateTask,
@@ -35,7 +35,7 @@ fun HomeScreen(
 }
 
 @Composable
-private fun HomeScreenContent(
+private fun AllTasksScreenContent(
     tasks: List<Task>,
     areas: List<Area>,
     onCreateTask: () -> Unit,
@@ -95,7 +95,7 @@ private fun HomeScreenContent(
 
 @Preview
 @Composable
-private fun HomeScreenPreview() {
+private fun AllTasksScreenPreview() {
     val errands = Area(Id(UUID(0, 1)), "Errands")
     val home = Area(Id(UUID(0, 2)), "Home")
     val tasks = listOf(
@@ -116,7 +116,7 @@ private fun HomeScreenPreview() {
     )
 
     MedusTheme(dynamicColor = false) {
-        HomeScreenContent(
+        AllTasksScreenContent(
             tasks = tasks,
             areas = listOf(errands, home),
             onCreateTask = {},

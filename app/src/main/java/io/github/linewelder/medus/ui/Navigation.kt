@@ -4,15 +4,15 @@ import androidx.compose.runtime.*
 import androidx.navigation.compose.*
 import io.github.linewelder.medus.ui.createtask.*
 import io.github.linewelder.medus.ui.edittask.*
-import io.github.linewelder.medus.ui.home.*
+import io.github.linewelder.medus.ui.alltasks.*
 import kotlinx.serialization.*
 
 @Composable
 fun MedusNavigation() {
     val navController = rememberNavController()
-    NavHost(navController = navController, startDestination = HomeRoute) {
-        composable<HomeRoute> {
-            HomeScreen(
+    NavHost(navController = navController, startDestination = AllTasksRoute) {
+        composable<AllTasksRoute> {
+            AllTasksScreen(
                 onCreateTask = { navController.navigate(CreateTaskRoute) },
                 onEditTask = { navController.navigate(EditTaskRoute(it.toString())) },
             )
@@ -27,7 +27,7 @@ fun MedusNavigation() {
 }
 
 @Serializable
-private data object HomeRoute
+private data object AllTasksRoute
 
 @Serializable
 private data object CreateTaskRoute

@@ -1,4 +1,4 @@
-package io.github.linewelder.medus.ui.home
+package io.github.linewelder.medus.ui.alltasks
 
 import androidx.lifecycle.*
 import dagger.hilt.android.lifecycle.*
@@ -8,7 +8,9 @@ import kotlinx.coroutines.*
 import javax.inject.*
 
 @HiltViewModel
-class HomeViewModel @Inject constructor(private val taskRepository: TaskRepository) : ViewModel() {
+class AllTasksViewModel @Inject constructor(
+    private val taskRepository: TaskRepository
+) : ViewModel() {
     val tasks = taskRepository.findAllTasks()
     val areas = taskRepository.findAllAreas()
 
