@@ -25,20 +25,26 @@ class TaskRepository @Inject constructor(
         completed: Boolean,
         newAreaName: String?,
     ): Boolean = database.withTransaction {
-        if (database.taskDao().getTask(id) == null) return@withTransaction false
+        val task = database.taskDao().getTask(id) ?: return@withTransaction false
 
         val newArea = newAreaName?.let { AreaEntity(id = Id.random(), name = it) }
         if (newArea != null) {
             database.areaDao().insert(newArea)
         }
-        database.taskDao().updateTask(id, title, newArea?.id ?: areaId, completed)
+        val dateCompleted = if (completed) task.dateCompleted ?: Date() else null
+        database.taskDao().updateTask(id, title, newArea?.id ?: areaId, dateCompleted)
         true
     }
 
     suspend fun deleteTask(id: Id<Task>) = database.taskDao().deleteTask(id)
 
-    suspend fun setTaskCompleted(id: Id<Task>, completed: Boolean) =
-        database.taskDao().setTaskCompleted(id, completed)
+    suspend fun setTaskCompleted(id: Id<Task>, completed: Boolean) {
+        if (completed) {
+            database.taskDao().markTaskCompleted(id, Date())
+        } else {
+            database.taskDao().markTaskIncomplete(id)
+        }
+    }
 
     fun findAllAreas(): Flow<List<Area>> =
         database.areaDao().getAllAreas().map { areas -> areas.map { Area(it.id, it.name) } }
@@ -54,7 +60,7 @@ class TaskRepository @Inject constructor(
                     id = Id.random(),
                     title = title,
                     dateCreated = Date(),
-                    completed = false,
+                    dateCompleted = null,
                     areaId = area.id,
                 )
             )

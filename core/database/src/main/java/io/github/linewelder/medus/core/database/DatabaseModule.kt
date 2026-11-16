@@ -17,6 +17,7 @@ object DatabaseModule {
     @Singleton
     fun provideMedusDatabase(@ApplicationContext context: Context): MedusDatabase =
         Room.databaseBuilder(context, MedusDatabase::class.java, "medus.db")
+            .addMigrations(migration2To3)
             .fallbackToDestructiveMigrationFrom(true, 1)
             .build()
 }

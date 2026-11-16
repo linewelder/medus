@@ -6,6 +6,6 @@ data class Task(
     val id: Id<Task>,
     val title: String,
     val dateCreated: Date,
-    val completed: Boolean,
+    val dateCompleted: Date?,
     val areaId: Id<Area>? = null,
 )

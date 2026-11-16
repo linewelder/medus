@@ -16,6 +16,7 @@ import io.github.linewelder.medus.core.model.*
 /** Display a task with a completion checkbox and strike through completed titles. */
 @Composable
 fun TaskListItem(task: Task, onEdit: () -> Unit, onCompletedChange: (Boolean) -> Unit) {
+    val completed = task.dateCompleted != null
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -29,21 +30,21 @@ fun TaskListItem(task: Task, onEdit: () -> Unit, onCompletedChange: (Boolean) ->
                 .clickable(role = Role.Button, onClick = onEdit)
                 .padding(start = 16.dp, top = 12.dp, bottom = 12.dp),
             style = MaterialTheme.typography.bodyLarge,
-            textDecoration = if (task.completed) TextDecoration.LineThrough else null,
+            textDecoration = if (completed) TextDecoration.LineThrough else null,
         )
         val completionLabel = stringResource(R.string.task_completion_for_title, task.title)
         Box(
             modifier = Modifier
                 .sizeIn(minWidth = 56.dp, minHeight = 48.dp)
                 .toggleable(
-                    value = task.completed,
+                    value = completed,
                     role = Role.Checkbox,
                     onValueChange = onCompletedChange,
                 )
                 .semantics { contentDescription = completionLabel },
             contentAlignment = Alignment.Center,
         ) {
-            Checkbox(checked = task.completed, onCheckedChange = null)
+            Checkbox(checked = completed, onCheckedChange = null)
         }
     }
 }

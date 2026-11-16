@@ -8,6 +8,6 @@ fun TaskEntity.asExternalModel() =
         id = id.unsafeCast(),
         title = title,
         dateCreated = dateCreated,
-        completed = completed,
+        dateCompleted = dateCompleted,
         areaId = areaId,
     )

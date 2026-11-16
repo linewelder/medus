@@ -54,7 +54,7 @@ fun EditTaskScreen(onClose: () -> Unit, viewModel: EditTaskViewModel = hiltViewM
                     var selectedAreaId by rememberSaveable { mutableStateOf(task.areaId?.toString()) }
                     var creatingArea by rememberSaveable { mutableStateOf(false) }
                     var areaName by rememberSaveable { mutableStateOf("") }
-                    var completed by rememberSaveable { mutableStateOf(task.completed) }
+                    var completed by rememberSaveable { mutableStateOf(task.dateCompleted != null) }
                     var confirmingDeletion by rememberSaveable { mutableStateOf(false) }
                     val selectedArea = areas.firstOrNull { it.id.toString() == selectedAreaId }
 
