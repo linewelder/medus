@@ -15,7 +15,6 @@ import io.github.linewelder.medus.core.model.*
 import io.github.linewelder.medus.ui.components.*
 
 @Composable
-@OptIn(ExperimentalMaterial3Api::class)
 fun HomeScreen(
     onCreateTask: () -> Unit,
     onEditTask: (Id<Task>) -> Unit,
@@ -24,8 +23,6 @@ fun HomeScreen(
     val tasks by viewModel.tasks.collectAsStateWithLifecycle(initialValue = emptyList())
     val areas by viewModel.areas.collectAsStateWithLifecycle(initialValue = emptyList())
     var selectedAreaId by rememberSaveable { mutableStateOf<String?>(null) }
-    var areaMenuExpanded by remember { mutableStateOf(false) }
-    val selectedArea = areas.firstOrNull { it.id.toString() == selectedAreaId }
     val visibleTasks = if (selectedAreaId == null) {
         tasks
     } else {
@@ -44,45 +41,22 @@ fun HomeScreen(
         },
     ) { innerPadding ->
         Column(modifier = Modifier.padding(innerPadding)) {
-            ExposedDropdownMenuBox(
-                expanded = areaMenuExpanded,
-                onExpandedChange = { areaMenuExpanded = it },
-                modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
-            ) {
-                val allAreasLabel = stringResource(R.string.all_areas)
-                OutlinedTextField(
-                    value = selectedArea?.name ?: allAreasLabel,
-                    onValueChange = {},
-                    readOnly = true,
-                    singleLine = true,
-                    label = { Text(stringResource(R.string.area_filter)) },
-                    trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = areaMenuExpanded) },
-                    modifier = Modifier
-                        .menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable)
-                        .fillMaxWidth(),
-                )
-                ExposedDropdownMenu(
-                    expanded = areaMenuExpanded,
-                    onDismissRequest = { areaMenuExpanded = false },
-                ) {
-                    DropdownMenuItem(
-                        text = { Text(allAreasLabel) },
-                        onClick = {
-                            selectedAreaId = null
-                            areaMenuExpanded = false
-                        },
-                    )
-                    for (area in areas) {
-                        DropdownMenuItem(
-                            text = { Text(area.name) },
-                            onClick = {
-                                selectedAreaId = area.id.toString()
-                                areaMenuExpanded = false
-                            },
-                        )
-                    }
-                }
+            val allAreasOption = HorizontalChooserOption(
+                id = "",
+                label = stringResource(R.string.all_areas),
+            )
+            val areaOptions = listOf(allAreasOption) + areas.map { area ->
+                HorizontalChooserOption(id = area.id.toString(), label = area.name)
             }
+            HorizontalChooser(
+                options = areaOptions,
+                selectedOptionId = selectedAreaId ?: allAreasOption.id,
+                onOptionSelected = { optionId ->
+                    selectedAreaId = optionId.takeUnless { it == allAreasOption.id }
+                },
+                modifier = Modifier.fillMaxWidth(),
+                contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
+            )
             LazyColumn(
                 modifier = Modifier.fillMaxWidth(),
                 contentPadding = PaddingValues(bottom = 88.dp),
