@@ -17,9 +17,11 @@ fun HorizontalChooser(
     onOptionSelected: (String) -> Unit,
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(0.dp),
+    state: LazyListState = rememberLazyListState(),
 ) {
     LazyRow(
         modifier = modifier,
+        state = state,
         contentPadding = contentPadding,
         horizontalArrangement = Arrangement.spacedBy(8.dp),
     ) {

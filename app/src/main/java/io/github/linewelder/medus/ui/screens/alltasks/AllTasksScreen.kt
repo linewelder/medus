@@ -2,6 +2,7 @@ package io.github.linewelder.medus.ui.screens.alltasks
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.*
+import androidx.compose.foundation.pager.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.*
@@ -15,6 +16,7 @@ import io.github.linewelder.medus.R
 import io.github.linewelder.medus.core.model.*
 import io.github.linewelder.medus.ui.components.*
 import io.github.linewelder.medus.ui.theme.*
+import kotlinx.coroutines.launch
 import java.util.*
 
 @Composable
@@ -24,7 +26,7 @@ fun AllTasksScreen(
     viewModel: AllTasksViewModel = hiltViewModel(),
 ) {
     val tasks by viewModel.tasks.collectAsStateWithLifecycle(initialValue = emptyList())
-    val areas by viewModel.areas.collectAsStateWithLifecycle(initialValue = emptyList())
+    val areas by viewModel.areas.collectAsStateWithLifecycle(initialValue = null)
     AllTasksScreenContent(
         tasks,
         areas,
@@ -37,17 +39,12 @@ fun AllTasksScreen(
 @Composable
 private fun AllTasksScreenContent(
     tasks: List<Task>,
-    areas: List<Area>,
+    areas: List<Area>?,
     onCreateTask: () -> Unit,
     onEditTask: (Id<Task>) -> Unit,
     onTaskCompletedChange: (Id<Task>, Boolean) -> Unit,
 ) {
-    var selectedAreaId by rememberSaveable { mutableStateOf<String?>(null) }
-    val visibleTasks = if (selectedAreaId == null) {
-        tasks
-    } else {
-        tasks.filter { it.areaId?.toString() == selectedAreaId }
-    }
+    var savedOptionId by rememberSaveable { mutableStateOf("") }
 
     Scaffold(
         modifier = Modifier.fillMaxSize(),
@@ -61,32 +58,60 @@ private fun AllTasksScreenContent(
         },
     ) { innerPadding ->
         Column(modifier = Modifier.padding(innerPadding)) {
-            val allAreasOption = HorizontalChooserOption(
-                id = "",
-                label = stringResource(R.string.all_areas),
-            )
-            val areaOptions = listOf(allAreasOption) + areas.map { area ->
-                HorizontalChooserOption(id = area.id.toString(), label = area.name)
-            }
-            HorizontalChooser(
-                options = areaOptions,
-                selectedOptionId = selectedAreaId ?: allAreasOption.id,
-                onOptionSelected = { optionId ->
-                    selectedAreaId = optionId.takeUnless { it == allAreasOption.id }
-                },
-                modifier = Modifier.fillMaxWidth(),
-                contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
-            )
-            LazyColumn(
-                modifier = Modifier.fillMaxWidth(),
-                contentPadding = PaddingValues(bottom = 88.dp),
-            ) {
-                items(visibleTasks, key = { it.id.value }) { task ->
-                    TaskListItem(
-                        task = task,
-                        onEdit = { onEditTask(task.id) },
-                        onCompletedChange = { onTaskCompletedChange(task.id, it) },
-                    )
+            if (areas != null) {
+                val allAreasOption = HorizontalChooserOption(
+                    id = "",
+                    label = stringResource(R.string.all_areas),
+                )
+                val areaOptions = listOf(allAreasOption) + areas.map { area ->
+                    HorizontalChooserOption(id = area.id.toString(), label = area.name)
+                }
+                val pageCount by rememberUpdatedState(areaOptions.size)
+                val pagerState = remember {
+                    val initialPage = areaOptions.indexOfFirst { it.id == savedOptionId }
+                    PagerState(currentPage = initialPage.coerceAtLeast(0)) { pageCount }
+                }
+                val chooserState = rememberLazyListState()
+                val scope = rememberCoroutineScope()
+                val selectedOptionIndex = pagerState.currentPage.coerceAtMost(areaOptions.lastIndex)
+                val settledOptionId = areaOptions.getOrNull(pagerState.settledPage)?.id
+                LaunchedEffect(settledOptionId) {
+                    if (settledOptionId != null) savedOptionId = settledOptionId
+                }
+                LaunchedEffect(selectedOptionIndex) {
+                    chooserState.animateScrollToItem(selectedOptionIndex)
+                }
+
+                HorizontalChooser(
+                    options = areaOptions,
+                    selectedOptionId = areaOptions[selectedOptionIndex].id,
+                    onOptionSelected = { optionId ->
+                        val page = areaOptions.indexOfFirst { it.id == optionId }
+                        scope.launch { pagerState.animateScrollToPage(page) }
+                    },
+                    modifier = Modifier.fillMaxWidth(),
+                    contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
+                    state = chooserState,
+                )
+                HorizontalPager(
+                    state = pagerState,
+                    modifier = Modifier.fillMaxWidth().weight(1f),
+                    key = { areaOptions[it].id },
+                ) { page ->
+                    val area = areas.getOrNull(page - 1)
+                    val visibleTasks = if (area == null) tasks else tasks.filter { it.areaId == area.id }
+                    LazyColumn(
+                        modifier = Modifier.fillMaxSize(),
+                        contentPadding = PaddingValues(bottom = 88.dp),
+                    ) {
+                        items(visibleTasks, key = { it.id.value }) { task ->
+                            TaskListItem(
+                                task = task,
+                                onEdit = { onEditTask(task.id) },
+                                onCompletedChange = { onTaskCompletedChange(task.id, it) },
+                            )
+                        }
+                    }
                 }
             }
         }
