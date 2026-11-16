@@ -10,6 +10,7 @@ import androidx.compose.runtime.saveable.*
 import androidx.compose.ui.*
 import androidx.compose.ui.res.*
 import androidx.compose.ui.semantics.*
+import androidx.compose.ui.tooling.preview.*
 import androidx.compose.ui.unit.*
 import androidx.hilt.lifecycle.viewmodel.compose.*
 import androidx.lifecycle.compose.*
@@ -17,6 +18,8 @@ import io.github.linewelder.medus.R
 import io.github.linewelder.medus.core.model.*
 import io.github.linewelder.medus.ui.components.*
 import io.github.linewelder.medus.ui.edittask.EditTaskViewModel.*
+import io.github.linewelder.medus.ui.theme.*
+import java.util.*
 
 /** Show the selected task's editable fields and confirm deletion before applying it. */
 @Composable
@@ -24,12 +27,25 @@ fun EditTaskScreen(onClose: () -> Unit, viewModel: EditTaskViewModel = hiltViewM
     val taskState by viewModel.taskState.collectAsStateWithLifecycle()
     val changeState by viewModel.changeState.collectAsStateWithLifecycle()
     val areas by viewModel.areas.collectAsStateWithLifecycle(initialValue = emptyList())
-    val editing = !changeState.blocksEditing
-
-    BackHandler(enabled = !editing) {}
+    BackHandler(enabled = changeState.blocksEditing) {}
     LaunchedEffect(changeState) {
         if (changeState == ChangeState.Finished) onClose()
     }
+
+    EditTaskScreenContent(taskState, changeState, areas, onClose, viewModel::saveTask, viewModel::deleteTask)
+}
+
+/** Render the edit form and deletion confirmation from the current task state. */
+@Composable
+private fun EditTaskScreenContent(
+    taskState: TaskState,
+    changeState: ChangeState,
+    areas: List<Area>,
+    onClose: () -> Unit,
+    onSaveTask: (String, Id<Area>?, Boolean, String?) -> Unit,
+    onDeleteTask: () -> Unit,
+) {
+    val editing = !changeState.blocksEditing
 
     Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
         Column(
@@ -128,11 +144,11 @@ fun EditTaskScreen(onClose: () -> Unit, viewModel: EditTaskViewModel = hiltViewM
                         val canSave = editing && title.isNotBlank() && (!creatingArea || areaName.isNotBlank())
                         Button(
                             onClick = {
-                                viewModel.saveTask(
-                                    title = title,
-                                    areaId = selectedAreaId?.let { Id.fromString<Area>(it) },
-                                    completed = completed,
-                                    newAreaName = areaName.takeIf { creatingArea },
+                                onSaveTask(
+                                    title,
+                                    selectedAreaId?.let { Id.fromString<Area>(it) },
+                                    completed,
+                                    areaName.takeIf { creatingArea },
                                 )
                             },
                             enabled = canSave,
@@ -154,7 +170,7 @@ fun EditTaskScreen(onClose: () -> Unit, viewModel: EditTaskViewModel = hiltViewM
                                 TextButton(
                                     onClick = {
                                         confirmingDeletion = false
-                                        viewModel.deleteTask()
+                                        onDeleteTask()
                                     },
                                     colors = ButtonDefaults.textButtonColors(
                                         contentColor = MaterialTheme.colorScheme.error,
@@ -168,5 +184,22 @@ fun EditTaskScreen(onClose: () -> Unit, viewModel: EditTaskViewModel = hiltViewM
                 }
             }
         }
+    }
+}
+
+@Preview
+@Composable
+private fun EditTaskScreenPreview() {
+    val area = Area(Id.empty(), "Errands")
+    val task = Task(Id.empty(), "Pick up groceries", Date(0), null, area.id)
+    MedusTheme(dynamicColor = false) {
+        EditTaskScreenContent(
+            taskState = TaskState.Loaded(task),
+            changeState = ChangeState.Editing,
+            areas = listOf(area),
+            onClose = {},
+            onSaveTask = { _, _, _, _ -> },
+            onDeleteTask = {},
+        )
     }
 }

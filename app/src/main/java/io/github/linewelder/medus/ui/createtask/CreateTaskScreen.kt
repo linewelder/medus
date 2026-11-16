@@ -8,12 +8,15 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.*
 import androidx.compose.ui.*
 import androidx.compose.ui.res.*
+import androidx.compose.ui.tooling.preview.*
 import androidx.compose.ui.unit.*
 import androidx.hilt.lifecycle.viewmodel.compose.*
 import androidx.lifecycle.compose.*
 import io.github.linewelder.medus.R
+import io.github.linewelder.medus.core.model.*
 import io.github.linewelder.medus.ui.components.*
 import io.github.linewelder.medus.ui.createtask.CreateTaskViewModel.*
+import io.github.linewelder.medus.ui.theme.*
 
 /** Display a task form with a choice of an existing area or an inline area name. */
 @Composable
@@ -23,6 +26,26 @@ fun CreateTaskScreen(
 ) {
     val areas by viewModel.areas.collectAsStateWithLifecycle(initialValue = emptyList())
     val saveState by viewModel.saveState.collectAsStateWithLifecycle()
+    BackHandler(enabled = saveState == SaveState.Saving || saveState == SaveState.Saved) {}
+    LaunchedEffect(saveState) {
+        if (saveState == SaveState.Saved) onClose()
+    }
+
+    CreateTaskScreenContent(
+        areas,
+        saveState,
+        onClose,
+        onSaveTask = viewModel::saveTask,
+    )
+}
+
+@Composable
+private fun CreateTaskScreenContent(
+    areas: List<Area>,
+    saveState: SaveState,
+    onClose: () -> Unit,
+    onSaveTask: (String, Area?, String) -> Unit,
+) {
     var title by rememberSaveable { mutableStateOf("") }
     var selectedAreaId by rememberSaveable { mutableStateOf<String?>(null) }
     var creatingArea by rememberSaveable { mutableStateOf(false) }
@@ -30,11 +53,6 @@ fun CreateTaskScreen(
     val selectedArea = areas.firstOrNull { it.id.toString() == selectedAreaId }
     val editing = saveState == SaveState.Editing || saveState == SaveState.Failed
     val hasArea = if (creatingArea) areaName.isNotBlank() else selectedArea != null
-
-    BackHandler(enabled = !editing) {}
-    LaunchedEffect(saveState) {
-        if (saveState == SaveState.Saved) onClose()
-    }
 
     Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
         Column(
@@ -79,12 +97,25 @@ fun CreateTaskScreen(
                     Text(stringResource(R.string.cancel))
                 }
                 Button(
-                    onClick = { viewModel.saveTask(title, selectedArea.takeUnless { creatingArea }, areaName) },
+                    onClick = { onSaveTask(title, selectedArea.takeUnless { creatingArea }, areaName) },
                     enabled = editing && title.isNotBlank() && hasArea,
                 ) {
                     Text(stringResource(R.string.save_task))
                 }
             }
         }
+    }
+}
+
+@Preview
+@Composable
+private fun CreateTaskScreenPreview() {
+    MedusTheme(dynamicColor = false) {
+        CreateTaskScreenContent(
+            areas = listOf(Area(Id.empty(), "Errands")),
+            saveState = SaveState.Editing,
+            onClose = {},
+            onSaveTask = { _, _, _ -> },
+        )
     }
 }
