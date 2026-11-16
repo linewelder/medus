@@ -11,10 +11,15 @@ import androidx.compose.ui.unit.*
 import androidx.hilt.lifecycle.viewmodel.compose.*
 import androidx.lifecycle.compose.*
 import io.github.linewelder.medus.R
+import io.github.linewelder.medus.core.model.*
 
 @Composable
 @OptIn(ExperimentalMaterial3Api::class)
-fun HomeScreen(onCreateTask: () -> Unit, viewModel: HomeViewModel = hiltViewModel()) {
+fun HomeScreen(
+    onCreateTask: () -> Unit,
+    onEditTask: (Id<Task>) -> Unit,
+    viewModel: HomeViewModel = hiltViewModel(),
+) {
     val tasks by viewModel.tasks.collectAsStateWithLifecycle(initialValue = emptyList())
     val areas by viewModel.areas.collectAsStateWithLifecycle(initialValue = emptyList())
     var selectedAreaId by rememberSaveable { mutableStateOf<String?>(null) }
@@ -84,6 +89,7 @@ fun HomeScreen(onCreateTask: () -> Unit, viewModel: HomeViewModel = hiltViewMode
                 items(visibleTasks, key = { it.id.value }) { task ->
                     TaskListItem(
                         task = task,
+                        onEdit = { onEditTask(task.id) },
                         onCompletedChange = { viewModel.setTaskCompleted(task.id, it) },
                     )
                 }

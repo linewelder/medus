@@ -15,6 +15,28 @@ class TaskRepository @Inject constructor(
     fun findAllTasks() =
         database.taskDao().getAllTasks().map { it.map(TaskEntity::asExternalModel) }
 
+    suspend fun getTask(id: Id<Task>) = database.taskDao().getTask(id)?.asExternalModel()
+
+    /** Update the task and save its new area together. Return whether the task still exists. */
+    suspend fun updateTask(
+        id: Id<Task>,
+        title: String,
+        areaId: Id<Area>?,
+        completed: Boolean,
+        newAreaName: String?,
+    ): Boolean = database.withTransaction {
+        if (database.taskDao().getTask(id) == null) return@withTransaction false
+
+        val newArea = newAreaName?.let { AreaEntity(id = Id.random(), name = it) }
+        if (newArea != null) {
+            database.areaDao().insert(newArea)
+        }
+        database.taskDao().updateTask(id, title, newArea?.id ?: areaId, completed)
+        true
+    }
+
+    suspend fun deleteTask(id: Id<Task>) = database.taskDao().deleteTask(id)
+
     suspend fun setTaskCompleted(id: Id<Task>, completed: Boolean) =
         database.taskDao().setTaskCompleted(id, completed)
 

@@ -12,6 +12,7 @@ import androidx.compose.ui.unit.*
 import androidx.hilt.lifecycle.viewmodel.compose.*
 import androidx.lifecycle.compose.*
 import io.github.linewelder.medus.R
+import io.github.linewelder.medus.ui.TaskAreaPicker
 import io.github.linewelder.medus.ui.createtask.CreateTaskViewModel.SaveState
 
 /** Display a task form with a choice of an existing area or an inline area name. */
@@ -26,7 +27,6 @@ fun CreateTaskScreen(
     var selectedAreaId by rememberSaveable { mutableStateOf<String?>(null) }
     var creatingArea by rememberSaveable { mutableStateOf(false) }
     var areaName by rememberSaveable { mutableStateOf("") }
-    var areaMenuExpanded by remember { mutableStateOf(false) }
     val selectedArea = areas.firstOrNull { it.id.toString() == selectedAreaId }
     val editing = saveState == SaveState.Editing || saveState == SaveState.Failed
     val hasArea = if (creatingArea) areaName.isNotBlank() else selectedArea != null
@@ -55,48 +55,19 @@ fun CreateTaskScreen(
                 singleLine = true,
                 modifier = Modifier.fillMaxWidth(),
             )
-            Box {
-                val areaLabel = when {
-                    creatingArea -> stringResource(R.string.new_area)
-                    selectedArea != null -> selectedArea.name
-                    else -> stringResource(R.string.choose_area)
-                }
-                OutlinedButton(onClick = { areaMenuExpanded = true }, enabled = editing) {
-                    Text(areaLabel)
-                }
-                DropdownMenu(
-                    expanded = areaMenuExpanded,
-                    onDismissRequest = { areaMenuExpanded = false },
-                ) {
-                    DropdownMenuItem(
-                        text = { Text(stringResource(R.string.new_area)) },
-                        onClick = {
-                            creatingArea = true
-                            areaMenuExpanded = false
-                        },
-                    )
-                    for (area in areas) {
-                        DropdownMenuItem(
-                            text = { Text(area.name) },
-                            onClick = {
-                                selectedAreaId = area.id.toString()
-                                creatingArea = false
-                                areaMenuExpanded = false
-                            },
-                        )
-                    }
-                }
-            }
-            if (creatingArea) {
-                OutlinedTextField(
-                    value = areaName,
-                    onValueChange = { areaName = it },
-                    label = { Text(stringResource(R.string.area_name)) },
-                    enabled = editing,
-                    singleLine = true,
-                    modifier = Modifier.fillMaxWidth(),
-                )
-            }
+            TaskAreaPicker(
+                areas = areas,
+                selectedArea = selectedArea,
+                creatingArea = creatingArea,
+                areaName = areaName,
+                enabled = editing,
+                onSelectArea = {
+                    selectedAreaId = it.id.toString()
+                    creatingArea = false
+                },
+                onCreateArea = { creatingArea = true },
+                onAreaNameChange = { areaName = it },
+            )
             if (saveState == SaveState.Failed) {
                 Text(stringResource(R.string.save_task_error), color = MaterialTheme.colorScheme.error)
             }

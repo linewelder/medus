@@ -31,8 +31,17 @@ interface TaskDao {
     @Query("SELECT * FROM tasks ORDER BY completed ASC, dateCreated DESC, id DESC")
     fun getAllTasks(): Flow<List<TaskEntity>>
 
+    @Query("SELECT * FROM tasks WHERE id = :id")
+    suspend fun getTask(id: Id<Task>): TaskEntity?
+
     @Query("UPDATE tasks SET completed = :completed WHERE id = :id")
     suspend fun setTaskCompleted(id: Id<Task>, completed: Boolean)
+
+    @Query("UPDATE tasks SET title = :title, areaId = :areaId, completed = :completed WHERE id = :id")
+    suspend fun updateTask(id: Id<Task>, title: String, areaId: Id<Area>?, completed: Boolean)
+
+    @Query("DELETE FROM tasks WHERE id = :id")
+    suspend fun deleteTask(id: Id<Task>)
 
     @Insert
     suspend fun insert(task: TaskEntity)
