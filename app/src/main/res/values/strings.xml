@@ -1,5 +1,8 @@
 <resources>
     <string name="app_name">Medus</string>
+    <string name="home">Home</string>
+    <string name="home_greeting">hello</string>
+    <string name="all_tasks">All Tasks</string>
     <string name="area_filter">Area</string>
     <string name="all_areas">All</string>
     <string name="create_task">Create task</string>
