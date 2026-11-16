@@ -1,4 +1,4 @@
-package io.github.linewelder.medus.ui.home
+package io.github.linewelder.medus.ui.components
 
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*

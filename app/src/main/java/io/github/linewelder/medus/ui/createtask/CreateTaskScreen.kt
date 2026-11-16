@@ -12,8 +12,8 @@ import androidx.compose.ui.unit.*
 import androidx.hilt.lifecycle.viewmodel.compose.*
 import androidx.lifecycle.compose.*
 import io.github.linewelder.medus.R
-import io.github.linewelder.medus.ui.TaskAreaPicker
-import io.github.linewelder.medus.ui.createtask.CreateTaskViewModel.SaveState
+import io.github.linewelder.medus.ui.components.*
+import io.github.linewelder.medus.ui.createtask.CreateTaskViewModel.*
 
 /** Display a task form with a choice of an existing area or an inline area name. */
 @Composable

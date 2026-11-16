@@ -15,9 +15,8 @@ import androidx.hilt.lifecycle.viewmodel.compose.*
 import androidx.lifecycle.compose.*
 import io.github.linewelder.medus.R
 import io.github.linewelder.medus.core.model.*
-import io.github.linewelder.medus.ui.TaskAreaPicker
-import io.github.linewelder.medus.ui.edittask.EditTaskViewModel.ChangeState
-import io.github.linewelder.medus.ui.edittask.EditTaskViewModel.TaskState
+import io.github.linewelder.medus.ui.components.*
+import io.github.linewelder.medus.ui.edittask.EditTaskViewModel.*
 
 /** Show the selected task's editable fields and confirm deletion before applying it. */
 @Composable

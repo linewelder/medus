@@ -12,6 +12,7 @@ import androidx.hilt.lifecycle.viewmodel.compose.*
 import androidx.lifecycle.compose.*
 import io.github.linewelder.medus.R
 import io.github.linewelder.medus.core.model.*
+import io.github.linewelder.medus.ui.components.*
 
 @Composable
 @OptIn(ExperimentalMaterial3Api::class)
