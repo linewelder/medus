@@ -10,6 +10,7 @@ import io.github.linewelder.medus.core.model.*
 
 /** Offer existing areas and an inline name field for a new area. */
 @Composable
+@OptIn(ExperimentalMaterial3Api::class)
 internal fun TaskAreaPicker(
     areas: List<Area>,
     selectedArea: Area?,
@@ -21,16 +22,29 @@ internal fun TaskAreaPicker(
     onAreaNameChange: (String) -> Unit,
 ) {
     var expanded by remember { mutableStateOf(false) }
-    Box {
+    ExposedDropdownMenuBox(
+        expanded = expanded,
+        onExpandedChange = { expanded = it },
+        modifier = Modifier.fillMaxWidth(),
+    ) {
         val areaLabel = when {
             creatingArea -> stringResource(R.string.new_area)
             selectedArea != null -> selectedArea.name
             else -> stringResource(R.string.choose_area)
         }
-        OutlinedButton(onClick = { expanded = true }, enabled = enabled) {
-            Text(areaLabel)
-        }
-        DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
+        OutlinedTextField(
+            value = areaLabel,
+            onValueChange = {},
+            readOnly = true,
+            enabled = enabled,
+            singleLine = true,
+            label = { Text(stringResource(R.string.area_filter)) },
+            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
+            modifier = Modifier
+                .menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable, enabled = enabled)
+                .fillMaxWidth(),
+        )
+        ExposedDropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
             DropdownMenuItem(
                 text = { Text(stringResource(R.string.new_area)) },
                 onClick = {
