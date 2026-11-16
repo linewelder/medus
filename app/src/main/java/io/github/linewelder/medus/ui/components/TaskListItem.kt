@@ -6,6 +6,7 @@ import androidx.compose.foundation.selection.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.*
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.*
 import androidx.compose.ui.semantics.*
 import androidx.compose.ui.text.style.*
@@ -31,6 +32,7 @@ fun TaskListItem(task: Task, onEdit: () -> Unit, onCompletedChange: (Boolean) ->
                 .padding(start = 16.dp, top = 12.dp, bottom = 12.dp),
             style = MaterialTheme.typography.bodyLarge,
             textDecoration = if (completed) TextDecoration.LineThrough else null,
+            color = if (completed) MaterialTheme.colorScheme.secondary else Color.Unspecified,
         )
         val completionLabel = stringResource(R.string.task_completion_for_title, task.title)
         Box(
