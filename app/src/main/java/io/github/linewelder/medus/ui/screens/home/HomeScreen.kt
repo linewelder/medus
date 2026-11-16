@@ -5,6 +5,8 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.*
 import androidx.compose.ui.tooling.preview.*
+import androidx.compose.ui.unit.dp
+import io.github.linewelder.medus.ui.components.*
 import io.github.linewelder.medus.ui.components.calendar.*
 import io.github.linewelder.medus.ui.theme.*
 
@@ -17,12 +19,16 @@ fun HomeScreen() {
 @Composable
 private fun HomeScreenContent(calendarContent: @Composable (Modifier) -> Unit) {
     Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-        calendarContent(
+        Column(
             Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
+                .padding(top = 16.dp)
                 .consumeWindowInsets(innerPadding),
-        )
+        ) {
+            CurrentTimeLabel(Modifier.fillMaxWidth())
+            calendarContent(Modifier.weight(1f).fillMaxWidth())
+        }
     }
 }
 
