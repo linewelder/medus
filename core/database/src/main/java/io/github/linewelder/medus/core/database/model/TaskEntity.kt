@@ -28,8 +28,11 @@ data class TaskEntity(
 
 @Dao
 interface TaskDao {
-    @Query("SELECT * FROM tasks ORDER BY dateCreated DESC, id DESC")
+    @Query("SELECT * FROM tasks ORDER BY completed ASC, dateCreated DESC, id DESC")
     fun getAllTasks(): Flow<List<TaskEntity>>
+
+    @Query("UPDATE tasks SET completed = :completed WHERE id = :id")
+    suspend fun setTaskCompleted(id: Id<Task>, completed: Boolean)
 
     @Insert
     suspend fun insert(task: TaskEntity)

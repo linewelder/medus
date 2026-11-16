@@ -15,6 +15,9 @@ class TaskRepository @Inject constructor(
     fun findAllTasks() =
         database.taskDao().getAllTasks().map { it.map(TaskEntity::asExternalModel) }
 
+    suspend fun setTaskCompleted(id: Id<Task>, completed: Boolean) =
+        database.taskDao().setTaskCompleted(id, completed)
+
     fun findAllAreas(): Flow<List<Area>> =
         database.areaDao().getAllAreas().map { areas -> areas.map { Area(it.id, it.name) } }
 
