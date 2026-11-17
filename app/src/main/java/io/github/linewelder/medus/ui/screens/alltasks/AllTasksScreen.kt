@@ -21,7 +21,7 @@ import java.util.*
 
 @Composable
 fun AllTasksScreen(
-    onCreateTask: () -> Unit,
+    onCreateTask: (Id<Area>?) -> Unit,
     onEditTask: (Id<Task>) -> Unit,
     viewModel: AllTasksViewModel = hiltViewModel(),
 ) {
@@ -40,16 +40,35 @@ fun AllTasksScreen(
 private fun AllTasksScreenContent(
     tasks: List<Task>,
     areas: List<Area>?,
-    onCreateTask: () -> Unit,
+    onCreateTask: (Id<Area>?) -> Unit,
     onEditTask: (Id<Task>) -> Unit,
     onTaskCompletedChange: (Id<Task>, Boolean) -> Unit,
 ) {
     var savedOptionId by rememberSaveable { mutableStateOf("") }
 
+    val allAreasOption = HorizontalChooserOption(
+        id = "",
+        label = stringResource(R.string.all_areas),
+    )
+    val areaOptions = listOf(allAreasOption) + areas.orEmpty().map { area ->
+        HorizontalChooserOption(id = area.id.toString(), label = area.name)
+    }
+    val pageCount by rememberUpdatedState(areaOptions.size)
+    val pagerState = if (areas != null) {
+        remember {
+            val initialPage = areaOptions.indexOfFirst { it.id == savedOptionId }
+            PagerState(currentPage = initialPage.coerceAtLeast(0)) { pageCount }
+        }
+    } else {
+        null
+    }
+    val selectedOptionIndex = (pagerState?.currentPage ?: 0).coerceAtMost(areaOptions.lastIndex)
+    val selectedAreaId = areas?.getOrNull(selectedOptionIndex - 1)?.id
+
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         floatingActionButton = {
-            FloatingActionButton(onClick = onCreateTask) {
+            FloatingActionButton(onClick = { onCreateTask(selectedAreaId) }) {
                 Icon(
                     painter = painterResource(R.drawable.ic_add),
                     contentDescription = stringResource(R.string.create_task),
@@ -58,22 +77,9 @@ private fun AllTasksScreenContent(
         },
     ) { innerPadding ->
         Column(modifier = Modifier.padding(innerPadding)) {
-            if (areas != null) {
-                val allAreasOption = HorizontalChooserOption(
-                    id = "",
-                    label = stringResource(R.string.all_areas),
-                )
-                val areaOptions = listOf(allAreasOption) + areas.map { area ->
-                    HorizontalChooserOption(id = area.id.toString(), label = area.name)
-                }
-                val pageCount by rememberUpdatedState(areaOptions.size)
-                val pagerState = remember {
-                    val initialPage = areaOptions.indexOfFirst { it.id == savedOptionId }
-                    PagerState(currentPage = initialPage.coerceAtLeast(0)) { pageCount }
-                }
+            if (areas != null && pagerState != null) {
                 val chooserState = rememberLazyListState()
                 val scope = rememberCoroutineScope()
-                val selectedOptionIndex = pagerState.currentPage.coerceAtMost(areaOptions.lastIndex)
                 val settledOptionId = areaOptions.getOrNull(pagerState.settledPage)?.id
                 LaunchedEffect(settledOptionId) {
                     if (settledOptionId != null) savedOptionId = settledOptionId

@@ -7,6 +7,7 @@ import androidx.compose.ui.*
 import androidx.compose.ui.res.*
 import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.compose.*
+import androidx.navigation.toRoute
 import io.github.linewelder.medus.R
 import io.github.linewelder.medus.ui.screens.alltasks.*
 import io.github.linewelder.medus.ui.screens.createtask.*
@@ -63,12 +64,15 @@ fun MedusNavigation() {
             }
             composable<AllTasksRoute> {
                 AllTasksScreen(
-                    onCreateTask = { navController.navigate(CreateTaskRoute) },
+                    onCreateTask = { navController.navigate(CreateTaskRoute(it?.toString())) },
                     onEditTask = { navController.navigate(EditTaskRoute(it.toString())) },
                 )
             }
-            composable<CreateTaskRoute> {
-                CreateTaskScreen(onClose = { navController.popBackStack() })
+            composable<CreateTaskRoute> { entry ->
+                CreateTaskScreen(
+                    onClose = { navController.popBackStack() },
+                    initialAreaId = entry.toRoute<CreateTaskRoute>().areaId,
+                )
             }
             composable<EditTaskRoute> {
                 EditTaskScreen(onClose = { navController.popBackStack() })
@@ -84,7 +88,7 @@ private data object HomeRoute
 private data object AllTasksRoute
 
 @Serializable
-private data object CreateTaskRoute
+private data class CreateTaskRoute(val areaId: String? = null)
 
 @Serializable
 internal data class EditTaskRoute(val taskId: String)

@@ -22,6 +22,7 @@ import io.github.linewelder.medus.ui.theme.*
 @Composable
 fun CreateTaskScreen(
     onClose: () -> Unit,
+    initialAreaId: String? = null,
     viewModel: CreateTaskViewModel = hiltViewModel(),
 ) {
     val areas by viewModel.areas.collectAsStateWithLifecycle(initialValue = emptyList())
@@ -35,6 +36,7 @@ fun CreateTaskScreen(
         areas,
         saveState,
         onClose,
+        initialAreaId = initialAreaId,
         onSaveTask = viewModel::saveTask,
     )
 }
@@ -44,10 +46,11 @@ private fun CreateTaskScreenContent(
     areas: List<Area>,
     saveState: SaveState,
     onClose: () -> Unit,
+    initialAreaId: String?,
     onSaveTask: (String, Area?, String) -> Unit,
 ) {
     var title by rememberSaveable { mutableStateOf("") }
-    var selectedAreaId by rememberSaveable { mutableStateOf<String?>(null) }
+    var selectedAreaId by rememberSaveable { mutableStateOf(initialAreaId) }
     var creatingArea by rememberSaveable { mutableStateOf(false) }
     var areaName by rememberSaveable { mutableStateOf("") }
     val selectedArea = areas.firstOrNull { it.id.toString() == selectedAreaId }
@@ -115,6 +118,7 @@ private fun CreateTaskScreenPreview() {
             areas = listOf(Area(Id.empty(), "Errands")),
             saveState = SaveState.Editing,
             onClose = {},
+            initialAreaId = null,
             onSaveTask = { _, _, _ -> },
         )
     }
