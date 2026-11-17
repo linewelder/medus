@@ -6,13 +6,17 @@ import androidx.compose.foundation.selection.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.*
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.geometry.*
+import androidx.compose.ui.graphics.*
+import androidx.compose.ui.layout.*
 import androidx.compose.ui.res.*
 import androidx.compose.ui.semantics.*
 import androidx.compose.ui.text.style.*
+import androidx.compose.ui.tooling.preview.*
 import androidx.compose.ui.unit.*
 import io.github.linewelder.medus.R
 import io.github.linewelder.medus.core.model.*
+import java.util.*
 
 /** Display a task with a completion checkbox and strike through completed titles. */
 @Composable
@@ -46,7 +50,56 @@ fun TaskListItem(task: Task, onEdit: () -> Unit, onCompletedChange: (Boolean) ->
                 .semantics { contentDescription = completionLabel },
             contentAlignment = Alignment.Center,
         ) {
-            Checkbox(checked = completed, onCheckedChange = null)
+            ConfettiCheckbox(checked = completed, onCheckedChange = null)
         }
+    }
+}
+
+@Composable
+private fun ConfettiCheckbox(
+    checked: Boolean,
+    modifier: Modifier = Modifier,
+    onCheckedChange: ((Boolean) -> Unit)?,
+) {
+    var confettiOrigin by remember { mutableStateOf(Offset(0f, 0f)) }
+    val confettiState = LocalConfettiState.current
+
+    Checkbox(
+        modifier = modifier.onGloballyPositioned {
+            val halfSize = it.size / 2
+            confettiOrigin = confettiState.canvasCoordinates.localPositionOf(
+                it,
+                Offset(
+                    halfSize.width.toFloat(),
+                    halfSize.height.toFloat(),
+                ),
+            )
+        },
+        checked = checked,
+        onCheckedChange = { newChecked ->
+            if (newChecked) {
+                confettiState.spawn(confettiOrigin)
+            }
+            onCheckedChange?.invoke(newChecked)
+        },
+    )
+}
+
+@Preview
+@Composable
+private fun TaskListItemPreview() {
+    var completed by remember { mutableStateOf(false) }
+
+    ConfettiOverlay {
+        TaskListItem(
+            task = Task(
+                id = Id.empty(),
+                title = "Do Homework",
+                dateCreated = Date(0),
+                dateCompleted = if (completed) Date(0) else null,
+            ),
+            onEdit = { },
+            onCompletedChange = { completed = it },
+        )
     }
 }
