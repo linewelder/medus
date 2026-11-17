@@ -13,6 +13,7 @@ import io.github.linewelder.medus.ui.screens.alltasks.*
 import io.github.linewelder.medus.ui.screens.createtask.*
 import io.github.linewelder.medus.ui.screens.edittask.*
 import io.github.linewelder.medus.ui.screens.home.*
+import io.github.linewelder.medus.ui.screens.menu.*
 import kotlinx.serialization.*
 
 @Composable
@@ -81,7 +82,9 @@ fun MedusNavigation() {
                     onEditTask = { navController.navigate(EditTaskRoute(it.toString())) },
                 )
             }
-            composable<MenuRoute> {}
+            composable<MenuRoute> {
+                MenuScreen()
+            }
             composable<CreateTaskRoute> { entry ->
                 CreateTaskScreen(
                     onClose = { navController.popBackStack() },
