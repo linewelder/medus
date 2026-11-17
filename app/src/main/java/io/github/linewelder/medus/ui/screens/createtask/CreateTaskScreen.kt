@@ -7,6 +7,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.*
 import androidx.compose.ui.*
+import androidx.compose.ui.focus.*
 import androidx.compose.ui.res.*
 import androidx.compose.ui.tooling.preview.*
 import androidx.compose.ui.unit.*
@@ -56,6 +57,7 @@ private fun CreateTaskScreenContent(
     val selectedArea = areas.firstOrNull { it.id.toString() == selectedAreaId }
     val editing = saveState == SaveState.Editing || saveState == SaveState.Failed
     val hasArea = if (creatingArea) areaName.isNotBlank() else selectedArea != null
+    val titleFocusRequester = remember { FocusRequester() }
 
     Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
         Column(
@@ -74,8 +76,11 @@ private fun CreateTaskScreenContent(
                 label = { Text(stringResource(R.string.task_title)) },
                 enabled = editing,
                 singleLine = true,
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier.fillMaxWidth().focusRequester(titleFocusRequester),
             )
+            LaunchedEffect(Unit) {
+                if (editing) titleFocusRequester.requestFocus()
+            }
             TaskAreaPicker(
                 areas = areas,
                 selectedArea = selectedArea,
