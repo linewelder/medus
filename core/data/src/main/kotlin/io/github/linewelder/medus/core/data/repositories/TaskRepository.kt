@@ -27,7 +27,7 @@ class TaskRepository @Inject constructor(
     ): Boolean = database.withTransaction {
         val task = database.taskDao().getTask(id) ?: return@withTransaction false
 
-        val newArea = newAreaName?.let { AreaEntity(id = Id.random(), name = it) }
+        val newArea = newAreaName?.let { Area(id = Id.random(), name = it) }
         if (newArea != null) {
             database.areaDao().insert(newArea)
         }
@@ -47,13 +47,14 @@ class TaskRepository @Inject constructor(
     }
 
     fun findAllAreas(): Flow<List<Area>> =
-        database.areaDao().getAllAreas().map { areas -> areas.map { Area(it.id, it.name) } }
+        database.areaDao().getAllAreas().map { areas -> areas.map { Area(it.id, it.name, it.sortOrder) } }
 
     /** Save a task and insert its new area in the same transaction when one is provided. */
     suspend fun createTask(title: String, area: Area, isNewArea: Boolean) {
+        val newArea = if (isNewArea) area.copy() else null
         database.withTransaction {
-            if (isNewArea) {
-                database.areaDao().insert(AreaEntity(id = area.id, name = area.name))
+            if (newArea != null) {
+                database.areaDao().insert(newArea)
             }
             database.taskDao().insert(
                 TaskEntity(
@@ -64,6 +65,9 @@ class TaskRepository @Inject constructor(
                     areaId = area.id,
                 )
             )
+        }
+        if (newArea != null) {
+            area.sortOrder = newArea.sortOrder
         }
     }
 }
