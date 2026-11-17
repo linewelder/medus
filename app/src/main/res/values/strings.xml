@@ -10,7 +10,8 @@
     <string name="home_no_tomorrow_events">No events tomorrow.</string>
     <string name="home_all_day">All day</string>
     <string name="home_untitled_event">Untitled event</string>
-    <string name="all_tasks">All Tasks</string>
+    <string name="tasks">Tasks</string>
+    <string name="menu">Menu</string>
     <string name="area_filter">Area</string>
     <string name="all_areas">All</string>
     <string name="create_task">Create task</string>
