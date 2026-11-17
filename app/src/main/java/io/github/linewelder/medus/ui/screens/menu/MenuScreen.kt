@@ -19,9 +19,12 @@ import java.util.UUID
 @Composable
 fun MenuScreen(viewModel: MenuViewModel = hiltViewModel()) {
     val areas by viewModel.areas.collectAsStateWithLifecycle(initialValue = emptyList())
+    val emptyAreaIds by viewModel.emptyAreaIds.collectAsStateWithLifecycle(initialValue = emptySet())
     MenuScreenContent(
         areas = areas,
+        emptyAreaIds = emptyAreaIds,
         onMove = { area, newIndex -> viewModel.moveArea(area.id, newIndex) },
+        onDeleteArea = viewModel::deleteEmptyArea,
     )
 }
 
@@ -29,8 +32,13 @@ fun MenuScreen(viewModel: MenuViewModel = hiltViewModel()) {
 @Composable
 private fun MenuScreenContent(
     areas: List<Area>,
+    emptyAreaIds: Set<Id<Area>>,
     onMove: (Area, Int) -> Unit,
+    onDeleteArea: (Id<Area>) -> Unit,
 ) {
+    var pendingDeletionId by remember { mutableStateOf<Id<Area>?>(null) }
+    val areaToDelete = areas.firstOrNull { it.id == pendingDeletionId && it.id in emptyAreaIds }
+
     Scaffold( modifier = Modifier.fillMaxSize()) { padding ->
         Column(
             Modifier
@@ -63,12 +71,49 @@ private fun MenuScreenContent(
                             .padding(vertical = 8.dp),
                     )
 
+                    if (area.id in emptyAreaIds) {
+                        IconButton(
+                            onClick = { pendingDeletionId = area.id },
+                            modifier = Modifier.height(48.dp),
+                        ) {
+                            Icon(
+                                painterResource(R.drawable.ic_delete),
+                                contentDescription = stringResource(R.string.delete_area_named, area.name),
+                            )
+                        }
+                    }
                     if (areas.size > 1) {
                         AreaDragHandle(area, dragHandle)
                     }
                 }
             }
         }
+    }
+
+    if (areaToDelete != null) {
+        AlertDialog(
+            onDismissRequest = { pendingDeletionId = null },
+            title = { Text(stringResource(R.string.delete_area)) },
+            text = { Text(stringResource(R.string.confirm_delete_area, areaToDelete.name)) },
+            dismissButton = {
+                TextButton(onClick = { pendingDeletionId = null }) {
+                    Text(stringResource(R.string.cancel))
+                }
+            },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        pendingDeletionId = null
+                        onDeleteArea(areaToDelete.id)
+                    },
+                    colors = ButtonDefaults.textButtonColors(
+                        contentColor = MaterialTheme.colorScheme.error,
+                    ),
+                ) {
+                    Text(stringResource(R.string.delete_area))
+                }
+            },
+        )
     }
 }
 
@@ -98,6 +143,11 @@ private fun MenuScreenPreview() {
     )
 
     MedusTheme(dynamicColor = false) {
-        MenuScreenContent(areas = areas, onMove = { _, _ -> })
+        MenuScreenContent(
+            areas = areas,
+            emptyAreaIds = setOf(areas.first().id),
+            onMove = { _, _ -> },
+            onDeleteArea = {},
+        )
     }
 }

@@ -29,6 +29,9 @@
     <string name="task_completion_for_title">Completion for %1$s</string>
     <string name="task_unavailable">Couldn’t open this task.</string>
     <string name="delete_task">Delete task</string>
+    <string name="delete_area">Delete area</string>
+    <string name="delete_area_named">Delete area %1$s</string>
+    <string name="confirm_delete_area">Delete “%1$s”?</string>
     <string name="confirm_delete_task">Delete “%1$s”?</string>
     <string name="delete_task_error">Couldn’t delete the task. Try again.</string>
 </resources>

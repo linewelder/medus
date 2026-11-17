@@ -7,17 +7,23 @@ import io.github.linewelder.medus.core.model.*
 import kotlinx.coroutines.*
 import javax.inject.*
 
-/** Expose the saved areas and persist changes to their order. */
+/** Expose the saved areas and handle reordering and deletion. */
 @HiltViewModel
 class MenuViewModel @Inject constructor(
     private val areaRepository: AreaRepository,
 ) : ViewModel() {
     val areas = areaRepository.findAllAreas()
+    val emptyAreaIds = areaRepository.findEmptyAreaIds()
 
-    /** Save the area's new position relative to its current position. */
     fun moveArea(id: Id<Area>, newIndex: Int) {
         viewModelScope.launch {
             areaRepository.moveArea(id, newIndex)
+        }
+    }
+
+    fun deleteEmptyArea(id: Id<Area>) {
+        viewModelScope.launch {
+            areaRepository.deleteEmptyArea(id)
         }
     }
 }

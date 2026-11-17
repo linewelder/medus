@@ -18,6 +18,10 @@ interface AreaDao {
     @Query("SELECT * FROM areas ORDER BY sortOrder, id")
     fun getAllAreas(): Flow<List<AreaEntity>>
 
+    /** Observe areas that have no tasks, including completed tasks. */
+    @Query("SELECT * FROM areas WHERE NOT EXISTS (SELECT 1 FROM tasks WHERE tasks.areaId = areas.id)")
+    fun getEmptyAreas(): Flow<List<AreaEntity>>
+
     /** Insert an area at the end of the current order and assign it the saved position. */
     @Transaction
     suspend fun insert(area: Area) {
