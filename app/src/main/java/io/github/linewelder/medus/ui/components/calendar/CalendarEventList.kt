@@ -72,7 +72,7 @@ internal fun CalendarEventList(
             }
         }
 
-        loading -> CircularProgressIndicator()
+        loading && events == null -> CircularProgressIndicator()
 
         events == null -> Text(stringResource(R.string.home_calendar_unavailable))
 
