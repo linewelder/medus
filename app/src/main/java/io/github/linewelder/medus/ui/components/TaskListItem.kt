@@ -2,7 +2,6 @@ package io.github.linewelder.medus.ui.components
 
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.selection.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.*
@@ -39,19 +38,13 @@ fun TaskListItem(task: Task, onEdit: () -> Unit, onCompletedChange: (Boolean) ->
             color = if (completed) MaterialTheme.colorScheme.secondary else Color.Unspecified,
         )
         val completionLabel = stringResource(R.string.task_completion_for_title, task.title)
-        Box(
+        ConfettiCheckbox(
+            checked = completed,
             modifier = Modifier
                 .sizeIn(minWidth = 56.dp, minHeight = 48.dp)
-                .toggleable(
-                    value = completed,
-                    role = Role.Checkbox,
-                    onValueChange = onCompletedChange,
-                )
                 .semantics { contentDescription = completionLabel },
-            contentAlignment = Alignment.Center,
-        ) {
-            ConfettiCheckbox(checked = completed, onCheckedChange = null)
-        }
+            onCheckedChange = onCompletedChange,
+        )
     }
 }
 
@@ -59,7 +52,7 @@ fun TaskListItem(task: Task, onEdit: () -> Unit, onCompletedChange: (Boolean) ->
 private fun ConfettiCheckbox(
     checked: Boolean,
     modifier: Modifier = Modifier,
-    onCheckedChange: ((Boolean) -> Unit)?,
+    onCheckedChange: (Boolean) -> Unit,
 ) {
     var confettiOrigin by remember { mutableStateOf(Offset(0f, 0f)) }
     val confettiState = LocalConfettiState.current
@@ -80,7 +73,7 @@ private fun ConfettiCheckbox(
             if (newChecked) {
                 confettiState.spawn(confettiOrigin)
             }
-            onCheckedChange?.invoke(newChecked)
+            onCheckedChange(newChecked)
         },
     )
 }
