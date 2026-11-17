@@ -46,9 +46,6 @@ class TaskRepository @Inject constructor(
         }
     }
 
-    fun findAllAreas(): Flow<List<Area>> =
-        database.areaDao().getAllAreas().map { areas -> areas.map { Area(it.id, it.name, it.sortOrder) } }
-
     /** Save a task and insert its new area in the same transaction when one is provided. */
     suspend fun createTask(title: String, area: Area, isNewArea: Boolean) {
         val newArea = if (isNewArea) area.copy() else null

@@ -16,9 +16,10 @@ import javax.inject.*
 class EditTaskViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     private val taskRepository: TaskRepository,
+    private val areaRepository: AreaRepository,
 ) : ViewModel() {
     private val taskId = Id.fromString<Task>(savedStateHandle.toRoute<EditTaskRoute>().taskId)
-    val areas = taskRepository.findAllAreas()
+    val areas = areaRepository.findAllAreas()
 
     private val mutableTaskState = MutableStateFlow<TaskState>(TaskState.Loading)
     val taskState = mutableTaskState.asStateFlow()

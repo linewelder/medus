@@ -9,10 +9,11 @@ import javax.inject.*
 
 @HiltViewModel
 class AllTasksViewModel @Inject constructor(
-    private val taskRepository: TaskRepository
+    private val taskRepository: TaskRepository,
+    private val areaRepository: AreaRepository,
 ) : ViewModel() {
     val tasks = taskRepository.findAllTasks()
-    val areas = taskRepository.findAllAreas()
+    val areas = areaRepository.findAllAreas()
 
     fun setTaskCompleted(id: Id<Task>, completed: Boolean) {
         viewModelScope.launch {

@@ -13,8 +13,9 @@ import javax.inject.*
 @HiltViewModel
 class CreateTaskViewModel @Inject constructor(
     private val taskRepository: TaskRepository,
+    private val areaRepository: AreaRepository,
 ) : ViewModel() {
-    val areas = taskRepository.findAllAreas()
+    val areas = areaRepository.findAllAreas()
 
     private val mutableSaveState = MutableStateFlow(SaveState.Editing)
     val saveState = mutableSaveState.asStateFlow()
