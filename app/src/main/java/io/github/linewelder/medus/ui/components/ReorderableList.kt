@@ -1,5 +1,6 @@
 package io.github.linewelder.medus.ui.components
 
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.*
@@ -12,6 +13,7 @@ fun <T> ReorderableList(
     key: (T) -> String,
     onMove: (item: T, newIndex: Int) -> Unit,
     modifier: Modifier = Modifier,
+    verticalArrangement: Arrangement.Vertical = Arrangement.Top,
     content: @Composable (item: T, dragHandleModifier: Modifier) -> Unit,
 ) {
     var displayedItems by remember(items) { mutableStateOf(items) }
@@ -28,7 +30,11 @@ fun <T> ReorderableList(
         }
     }
 
-    LazyColumn(modifier = modifier, state = listState) {
+    LazyColumn(
+        modifier = modifier,
+        state = listState,
+        verticalArrangement = verticalArrangement,
+    ) {
         items(displayedItems, key = key) { item ->
             ReorderableItem(reorderState, key = key(item)) {
                 val handle = Modifier.draggableHandle(
