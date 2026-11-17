@@ -12,7 +12,7 @@ class AreaRepository @Inject constructor(
     fun findAllAreas(): Flow<List<Area>> =
         database.areaDao().getAllAreas().map { areas -> areas.map { Area(it.id, it.name, it.sortOrder) } }
 
-    suspend fun moveArea(id: Id<Area>, offset: Int) = database.areaDao().moveArea(id, offset)
+    suspend fun moveArea(id: Id<Area>, newIndex: Int) = database.areaDao().moveArea(id, newIndex)
 
     suspend fun deleteEmptyArea(id: Id<Area>) = database.areaDao().deleteEmptyArea(id)
 }

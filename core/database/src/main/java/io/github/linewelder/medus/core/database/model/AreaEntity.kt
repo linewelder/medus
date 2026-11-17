@@ -26,16 +26,14 @@ interface AreaDao {
         area.sortOrder = sortOrder
     }
 
-    /** Move an area by the given offset and save the resulting order atomically. */
     @Transaction
-    suspend fun moveArea(id: Id<Area>, offset: Int) {
+    suspend fun moveArea(id: Id<Area>, newIndex: Int) {
         val areas = getAllAreas().first().toMutableList()
         val currentIndex = areas.indexOfFirst { it.id == id }
-        val targetIndex = currentIndex + offset
-        val canMove = currentIndex >= 0 && targetIndex in areas.indices
+        val canMove = currentIndex >= 0 && newIndex in areas.indices
         if (!canMove) return
 
-        areas.add(targetIndex, areas.removeAt(currentIndex))
+        areas.add(newIndex, areas.removeAt(currentIndex))
         areas.forEachIndexed { index, area ->
             val sortOrder = index.toLong()
             if (area.sortOrder != sortOrder) updateSortOrder(area.id, sortOrder)
