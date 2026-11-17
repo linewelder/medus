@@ -12,6 +12,8 @@
     <string name="home_untitled_event">Untitled event</string>
     <string name="tasks">Tasks</string>
     <string name="menu">Menu</string>
+    <string name="areas">Areas</string>
+    <string name="reorder_area">Reorder %1$s</string>
     <string name="area_filter">Area</string>
     <string name="all_areas">All</string>
     <string name="create_task">Create task</string>
