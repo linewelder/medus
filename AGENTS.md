@@ -5,6 +5,7 @@ Android app (Kotlin, Jetpack Compose, Hilt, Room) for planning daily tasks and e
 ## Rules
 
 - Place all UI components in the `ui.components` package.
+- Keep reusable UI behavior, such as drag-to-reorder gestures, animation and autoscroll, in a dedicated component. Screens supply content and handle feature-specific callbacks. Wrap third-party UI behavior in a component before using it in a screen.
 - Let the code explain itself: use descriptive names, and extract hard-to-read conditions into a named `val` before the `if`.
 - Avoid comments inside function bodies.
 - This excludes comments that cannot be integrated into code: e.g. describing why a certain warning or deprecation is suppressed. Things like these are not relevant to the function's behaviour and should not be included in the KDoc.
