@@ -28,7 +28,15 @@ data class TaskEntity(
 
 @Dao
 interface TaskDao {
-    @Query("SELECT * FROM tasks ORDER BY (dateCompleted IS NOT NULL) ASC, dateCreated DESC, id DESC")
+    @Query("""
+        SELECT tasks.*
+        FROM tasks
+        JOIN areas ON areas.id = tasks.areaId
+        ORDER BY (dateCompleted IS NOT NULL) ASC,
+                 areas.sortOrder ASC,
+                 dateCreated DESC,
+                 id DESC
+        """)
     fun getAllTasks(): Flow<List<TaskEntity>>
 
     @Query("SELECT * FROM tasks WHERE id = :id")
