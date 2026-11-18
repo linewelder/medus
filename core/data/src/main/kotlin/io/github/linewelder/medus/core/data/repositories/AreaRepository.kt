@@ -1,6 +1,8 @@
 package io.github.linewelder.medus.core.data.repositories
 
+import io.github.linewelder.medus.core.data.mappings.*
 import io.github.linewelder.medus.core.database.*
+import io.github.linewelder.medus.core.database.model.*
 import io.github.linewelder.medus.core.model.*
 import kotlinx.coroutines.flow.*
 import javax.inject.*
@@ -10,7 +12,7 @@ class AreaRepository @Inject constructor(
     private val database: MedusDatabase,
 ) {
     fun findAllAreas(): Flow<List<Area>> =
-        database.areaDao().getAllAreas().map { areas -> areas.map { Area(it.id, it.name, it.sortOrder) } }
+        database.areaDao().getAllAreas().map { areas -> areas.map(AreaEntity::asExternalModel) }
 
     fun findEmptyAreaIds(): Flow<Set<Id<Area>>> =
         database.areaDao().getEmptyAreas().map { areas -> areas.map { it.id }.toSet() }
@@ -19,3 +21,4 @@ class AreaRepository @Inject constructor(
 
     suspend fun deleteEmptyArea(id: Id<Area>) = database.areaDao().deleteEmptyArea(id)
 }
+
