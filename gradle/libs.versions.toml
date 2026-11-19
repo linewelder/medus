@@ -16,6 +16,7 @@ androidxHilt = "1.4.0"
 ksp = "2.3.6"
 room = "2.8.5"
 reorderable = "3.1.0"
+kmpWheelPicker = "0.3.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -35,6 +36,7 @@ androidx-compose-ui-test-manifest = { group = "androidx.compose.ui", name = "ui-
 androidx-compose-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit4" }
 androidx-compose-material3 = { group = "androidx.compose.material3", name = "material3" }
 reorderable = { module = "sh.calvin.reorderable:reorderable", version.ref = "reorderable" }
+swmansion-kmpWheelPicker = { group = "com.swmansion.kmpwheelpicker", name = "kmp-wheel-picker", version.ref = "kmpWheelPicker" }
 
 androidx-room-runtime = { group = "androidx.room", name = "room-runtime", version.ref = "room" }
 androidx-room-compiler = { group = "androidx.room", name = "room-compiler", version.ref = "room" }
