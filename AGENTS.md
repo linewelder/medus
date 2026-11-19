@@ -36,7 +36,7 @@ Android app (Kotlin, Jetpack Compose, Hilt, Room) for planning daily tasks and e
 - This excludes comments that cannot be integrated into code: e.g. describing why a certain warning or deprecation is suppressed. Things like these are not relevant to the function's behaviour and should not be included in the KDoc.
 - Keep single-use logic and `remember*` helpers inline when extraction would only add a name or KDoc. Use descriptive local variables such as `exerciseOrder`. Follow the Compose component rules above for distinct UI sections and behaviors.
 - Write KDoc for classes, functions, properties and fields, unless the name already says everything (typical for one-liners).
-- Write KDoc for functions in imperative.
+- Write KDoc for functions in imperative, except for @Composable UI components.
 - Edit plain text and numbers in-line with text fields. Use a dialog (opened from a `FakeOutlinedTextField`) only for values that aren't plain text or numbers (e.g. `SetTarget`, `SetResult`); those dialogs will get customised inputs.
 - Commit messages follow Conventional Commits (`feat:`, `fix:`, `refactor:`, `test:`, `chore:`, `docs:`, `build:`), imperative mood, capitalized subject.
 - Use extended commit messages for reasoning, not the list of changes. Only add them if the reason is not obvious.
