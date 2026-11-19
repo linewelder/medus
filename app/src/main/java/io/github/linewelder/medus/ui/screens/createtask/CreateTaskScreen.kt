@@ -48,12 +48,13 @@ private fun CreateTaskScreenContent(
     saveState: SaveState,
     onClose: () -> Unit,
     initialAreaId: String?,
-    onSaveTask: (String, Area?, String) -> Unit,
+    onSaveTask: (String, Area?, String, Int?) -> Unit,
 ) {
     var title by rememberSaveable { mutableStateOf("") }
     var selectedAreaId by rememberSaveable { mutableStateOf(initialAreaId) }
     var creatingArea by rememberSaveable { mutableStateOf(false) }
     var areaName by rememberSaveable { mutableStateOf("") }
+    var timeEstimateMins by rememberSaveable { mutableStateOf<Int?>(null) }
     val selectedArea = areas.firstOrNull { it.id.toString() == selectedAreaId }
     val editing = saveState == SaveState.Editing || saveState == SaveState.Failed
     val hasArea = if (creatingArea) areaName.isNotBlank() else selectedArea != null
@@ -94,6 +95,11 @@ private fun CreateTaskScreenContent(
                 onCreateArea = { creatingArea = true },
                 onAreaNameChange = { areaName = it },
             )
+            TaskTimeEstimatePicker(
+                timeEstimateMins = timeEstimateMins,
+                enabled = editing,
+                onTimeEstimateChange = { timeEstimateMins = it },
+            )
             if (saveState == SaveState.Failed) {
                 Text(stringResource(R.string.save_task_error), color = MaterialTheme.colorScheme.error)
             }
@@ -105,7 +111,9 @@ private fun CreateTaskScreenContent(
                     Text(stringResource(R.string.cancel))
                 }
                 Button(
-                    onClick = { onSaveTask(title, selectedArea.takeUnless { creatingArea }, areaName) },
+                    onClick = {
+                        onSaveTask(title, selectedArea.takeUnless { creatingArea }, areaName, timeEstimateMins)
+                    },
                     enabled = editing && title.isNotBlank() && hasArea,
                 ) {
                     Text(stringResource(R.string.save_task))
@@ -124,7 +132,7 @@ private fun CreateTaskScreenPreview() {
             saveState = SaveState.Editing,
             onClose = {},
             initialAreaId = null,
-            onSaveTask = { _, _, _ -> },
+            onSaveTask = { _, _, _, _ -> },
         )
     }
 }

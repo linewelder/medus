@@ -9,7 +9,7 @@ import io.github.linewelder.medus.core.database.model.*
         TaskEntity::class,
         AreaEntity::class,
     ],
-    version = 4,
+    version = 5,
 )
 @TypeConverters(
     DateConverter::class,

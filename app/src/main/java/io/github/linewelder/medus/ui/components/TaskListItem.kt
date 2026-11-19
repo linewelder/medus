@@ -27,16 +27,26 @@ fun TaskListItem(task: Task, onEdit: () -> Unit, onCompletedChange: (Boolean) ->
             .heightIn(min = 48.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        Text(
-            text = task.title,
+        Row(
             modifier = Modifier
                 .weight(1f)
                 .clickable(role = Role.Button, onClick = onEdit)
                 .padding(start = 16.dp, top = 12.dp, bottom = 12.dp),
-            style = MaterialTheme.typography.bodyLarge,
-            textDecoration = if (completed) TextDecoration.LineThrough else null,
-            color = if (completed) MaterialTheme.colorScheme.secondary else Color.Unspecified,
-        )
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Text(
+                text = task.title,
+                modifier = Modifier.weight(1f, fill = false),
+                style = MaterialTheme.typography.bodyLarge,
+                textDecoration = if (completed) TextDecoration.LineThrough else null,
+                color = if (completed) MaterialTheme.colorScheme.secondary else Color.Unspecified,
+            )
+
+            if (!completed) {
+                task.timeEstimateMins?.let { TimeEstimateLabel(it) }
+            }
+        }
         val completionLabel = stringResource(R.string.task_completion_for_title, task.title)
         ConfettiCheckbox(
             checked = completed,
@@ -44,6 +54,21 @@ fun TaskListItem(task: Task, onEdit: () -> Unit, onCompletedChange: (Boolean) ->
                 .sizeIn(minWidth = 56.dp, minHeight = 48.dp)
                 .semantics { contentDescription = completionLabel },
             onCheckedChange = onCompletedChange,
+        )
+    }
+}
+
+@Composable
+private fun TimeEstimateLabel(minutes: Int) {
+    Surface(
+        shape = MaterialTheme.shapes.extraSmall,
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline),
+    ) {
+        Text(
+            text = formatDurationMinutes(minutes),
+            modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp),
+            style = MaterialTheme.typography.labelMedium,
+            softWrap = false,
         )
     }
 }
@@ -88,6 +113,7 @@ private fun TaskListItemPreview() {
             task = Task(
                 id = Id.empty(),
                 title = "Do Homework",
+                timeEstimateMins = 60,
                 dateCreated = Date(0),
                 dateCompleted = if (completed) Date(0) else null,
             ),

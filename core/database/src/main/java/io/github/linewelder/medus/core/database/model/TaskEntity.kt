@@ -24,6 +24,7 @@ data class TaskEntity(
     val dateCreated: Date,
     val dateCompleted: Date?,
     val areaId: Id<Area>? = null,
+    val timeEstimateMins: Int? = null,
 )
 
 @Dao
@@ -48,8 +49,19 @@ interface TaskDao {
     @Query("UPDATE tasks SET dateCompleted = NULL WHERE id = :id")
     suspend fun markTaskIncomplete(id: Id<Task>)
 
-    @Query("UPDATE tasks SET title = :title, areaId = :areaId, dateCompleted = :dateCompleted WHERE id = :id")
-    suspend fun updateTask(id: Id<Task>, title: String, areaId: Id<Area>?, dateCompleted: Date?)
+    @Query("""
+        UPDATE tasks
+        SET title = :title, areaId = :areaId, dateCompleted = :dateCompleted,
+            timeEstimateMins = :timeEstimateMins
+        WHERE id = :id
+        """)
+    suspend fun updateTask(
+        id: Id<Task>,
+        title: String,
+        areaId: Id<Area>?,
+        dateCompleted: Date?,
+        timeEstimateMins: Int?,
+    )
 
     @Query("DELETE FROM tasks WHERE id = :id")
     suspend fun deleteTask(id: Id<Task>)

@@ -38,13 +38,19 @@ class EditTaskViewModel @Inject constructor(
     }
 
     /** Save the edited fields and create an area if a new name was entered. */
-    fun saveTask(title: String, areaId: Id<Area>?, completed: Boolean, newAreaName: String?) {
+    fun saveTask(
+        title: String,
+        areaId: Id<Area>?,
+        completed: Boolean,
+        newAreaName: String?,
+        timeEstimateMins: Int?,
+    ) {
         val taskTitle = title.trim()
         val areaName = newAreaName?.trim()
         if (taskTitle.isEmpty() || areaName == "") return
 
         applyChange(failure = ChangeState.SaveFailed) {
-            if (taskRepository.updateTask(taskId, taskTitle, areaId, completed, areaName)) {
+            if (taskRepository.updateTask(taskId, taskTitle, areaId, completed, areaName, timeEstimateMins)) {
                 ChangeState.Finished
             } else {
                 mutableTaskState.value = TaskState.Unavailable

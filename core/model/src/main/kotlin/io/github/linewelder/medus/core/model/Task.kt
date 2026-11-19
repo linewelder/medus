@@ -8,4 +8,5 @@ data class Task(
     val dateCreated: Date,
     val dateCompleted: Date?,
     val areaId: Id<Area>? = null,
+    val timeEstimateMins: Int? = null,
 )

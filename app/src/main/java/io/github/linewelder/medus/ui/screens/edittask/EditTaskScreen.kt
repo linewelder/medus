@@ -42,7 +42,7 @@ private fun EditTaskScreenContent(
     changeState: ChangeState,
     areas: List<Area>,
     onClose: () -> Unit,
-    onSaveTask: (String, Id<Area>?, Boolean, String?) -> Unit,
+    onSaveTask: (String, Id<Area>?, Boolean, String?, Int?) -> Unit,
     onDeleteTask: () -> Unit,
 ) {
     val editing = !changeState.blocksEditing
@@ -70,6 +70,7 @@ private fun EditTaskScreenContent(
                     var selectedAreaId by rememberSaveable { mutableStateOf(task.areaId?.toString()) }
                     var creatingArea by rememberSaveable { mutableStateOf(false) }
                     var areaName by rememberSaveable { mutableStateOf("") }
+                    var timeEstimateMins by rememberSaveable { mutableStateOf(task.timeEstimateMins) }
                     var completed by rememberSaveable { mutableStateOf(task.dateCompleted != null) }
                     var confirmingDeletion by rememberSaveable { mutableStateOf(false) }
                     val selectedArea = areas.firstOrNull { it.id.toString() == selectedAreaId }
@@ -94,6 +95,11 @@ private fun EditTaskScreenContent(
                         },
                         onCreateArea = { creatingArea = true },
                         onAreaNameChange = { areaName = it },
+                    )
+                    TaskTimeEstimatePicker(
+                        timeEstimateMins = timeEstimateMins,
+                        enabled = editing,
+                        onTimeEstimateChange = { timeEstimateMins = it },
                     )
                     Row(
                         modifier = Modifier
@@ -149,6 +155,7 @@ private fun EditTaskScreenContent(
                                     selectedAreaId?.let { Id.fromString<Area>(it) },
                                     completed,
                                     areaName.takeIf { creatingArea },
+                                    timeEstimateMins,
                                 )
                             },
                             enabled = canSave,
@@ -198,7 +205,7 @@ private fun EditTaskScreenPreview() {
             changeState = ChangeState.Editing,
             areas = listOf(area),
             onClose = {},
-            onSaveTask = { _, _, _, _ -> },
+            onSaveTask = { _, _, _, _, _ -> },
             onDeleteTask = {},
         )
     }
