@@ -20,8 +20,13 @@ import kotlin.random.*
 
 private val PARTICLE_SIZE = Size(30f, 30f)
 private val GRAVITY = Offset(0f, 400f)
-private val MIN_LAUNCH_VELOCITY = Offset(-300f, -1000f)
+private val MIN_LAUNCH_VELOCITY = Offset(-300f, -800f)
 private val MAX_LAUNCH_VELOCITY = Offset(300f, -500f)
+/**
+ * How much confetti's initial velocities are pulled towards the center of the canvas.
+ */
+private const val LAUNCH_VELOCITY_CENTER_PULL = 0.5f
+private const val DEFAULT_SPAWN_NUMBER = 50
 private val PARTICLE_COLORS = listOf(
     Color.Red, Color.Blue, Color.Yellow, Color.Green, Color.Magenta,
 )
@@ -108,7 +113,7 @@ class ConfettiState {
      *
      * @param position Relative to the parent [ConfettiOverlay]
      */
-    fun spawn(position: Offset, number: Int = 25) {
+    fun spawn(position: Offset, number: Int = DEFAULT_SPAWN_NUMBER) {
         repeat(number) {
             particles.add(createRandomParticle(position))
         }
@@ -146,7 +151,7 @@ class ConfettiState {
                 MIN_LAUNCH_VELOCITY.y.toDouble(),
                 MAX_LAUNCH_VELOCITY.y.toDouble(),
             ).toFloat(),
-        ) - offsetFromCenter / 2f
+        ) - offsetFromCenter * LAUNCH_VELOCITY_CENTER_PULL
 
         return Particle(
             color = PARTICLE_COLORS[random.nextInt(PARTICLE_COLORS.size)],
