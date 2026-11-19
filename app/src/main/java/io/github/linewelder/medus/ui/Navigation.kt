@@ -74,7 +74,9 @@ fun MedusNavigation() {
             modifier = Modifier.padding(innerPadding).consumeWindowInsets(innerPadding),
         ) {
             composable<HomeRoute> {
-                HomeScreen()
+                HomeScreen(
+                    onNewTask = { navController.navigate(CreateTaskRoute(areaId = null)) },
+                )
             }
             composable<AllTasksRoute> {
                 AllTasksScreen(

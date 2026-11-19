@@ -34,4 +34,5 @@
     <string name="confirm_delete_area">Delete “%1$s”?</string>
     <string name="confirm_delete_task">Delete “%1$s”?</string>
     <string name="delete_task_error">Couldn’t delete the task. Try again.</string>
+    <string name="new_task">New Task</string>
 </resources>

@@ -4,30 +4,49 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.*
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.*
 import androidx.compose.ui.unit.dp
+import io.github.linewelder.medus.R
 import io.github.linewelder.medus.ui.components.*
 import io.github.linewelder.medus.ui.components.calendar.*
 import io.github.linewelder.medus.ui.theme.*
 
 @Composable
-fun HomeScreen() {
-    HomeScreenContent { modifier -> DeviceCalendarEventList(modifier) }
+fun HomeScreen(
+    onNewTask: () -> Unit,
+) {
+    HomeScreenContent(
+        onNewTask = onNewTask,
+    ) { modifier ->
+        DeviceCalendarEventList(modifier)
+    }
 }
 
 /** Apply the screen background and system insets to the home content. */
 @Composable
-private fun HomeScreenContent(calendarContent: @Composable (Modifier) -> Unit) {
+private fun HomeScreenContent(
+    onNewTask: () -> Unit,
+    calendarContent: @Composable (Modifier) -> Unit,
+) {
     Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
         Column(
             Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
-                .padding(top = 16.dp)
+                .padding(16.dp)
                 .consumeWindowInsets(innerPadding),
         ) {
-            CurrentTimeLabel(Modifier.fillMaxWidth())
+            CurrentTimeLabel(Modifier.fillMaxWidth().padding(bottom = 8.dp))
+
             calendarContent(Modifier.weight(1f).fillMaxWidth())
+
+            Button(
+                modifier = Modifier.fillMaxWidth(),
+                onClick = onNewTask,
+            ) {
+                Text(stringResource(R.string.new_task))
+            }
         }
     }
 }
@@ -46,7 +65,9 @@ private fun HomeScreenPreview() {
     )
 
     MedusTheme(dynamicColor = false) {
-        HomeScreenContent { modifier ->
+        HomeScreenContent(
+            onNewTask = { },
+        ) { modifier ->
             CalendarEventList(
                 events = events,
                 hasCalendarAccess = true,

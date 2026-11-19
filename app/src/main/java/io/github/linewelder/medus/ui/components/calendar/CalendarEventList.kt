@@ -12,11 +12,13 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.*
 import androidx.compose.ui.platform.*
 import androidx.compose.ui.res.*
+import androidx.compose.ui.tooling.preview.*
 import androidx.compose.ui.unit.*
 import androidx.core.content.*
 import androidx.hilt.lifecycle.viewmodel.compose.*
 import androidx.lifecycle.compose.*
 import io.github.linewelder.medus.R
+import io.github.linewelder.medus.ui.theme.*
 
 /** Connect the calendar list to runtime permissions and live calendar state. */
 @Composable
@@ -78,7 +80,6 @@ internal fun CalendarEventList(
 
         else -> LazyColumn(
             modifier = modifier,
-            contentPadding = PaddingValues(16.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
             item {
@@ -114,5 +115,28 @@ private fun LazyListScope.calendarEventRows(events: List<CalendarEvent>, emptyMe
                 Text(timeFrame, style = MaterialTheme.typography.bodySmall)
             }
         }
+    }
+}
+
+@Preview
+@Composable
+private fun CalendarEventListPreview() {
+    val events = CalendarEventDays(
+        today = listOf(
+            CalendarEvent("School holiday", start = 0L, end = 86_400_000L, allDay = true),
+            CalendarEvent("Pick up groceries", start = 36_000_000L, end = 39_600_000L, allDay = false),
+        ),
+        tomorrow = listOf(
+            CalendarEvent("Dentist appointment", start = 122_400_000L, end = 124_200_000L, allDay = false),
+        ),
+    )
+
+    MedusTheme(dynamicColor = false) {
+        CalendarEventList(
+            events = events,
+            hasCalendarAccess = true,
+            loading = false,
+            onRequestCalendarAccess = {},
+        )
     }
 }
