@@ -12,7 +12,7 @@ import io.github.linewelder.medus.core.database.model.*
     version = 5,
 )
 @TypeConverters(
-    DateConverter::class,
+    InstantConverter::class,
 )
 abstract class MedusDatabase : RoomDatabase() {
     abstract fun taskDao(): TaskDao

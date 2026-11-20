@@ -1,12 +1,12 @@
 package io.github.linewelder.medus.core.model
 
-import java.util.*
+import kotlin.time.*
 
 data class Task(
     val id: Id<Task>,
     val title: String,
-    val dateCreated: Date,
-    val dateCompleted: Date?,
+    val dateCreated: Instant,
+    val dateCompleted: Instant?,
     val areaId: Id<Area>? = null,
     val timeEstimateMins: Int? = null,
 )

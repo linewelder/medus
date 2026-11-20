@@ -19,7 +19,7 @@ import io.github.linewelder.medus.core.model.*
 import io.github.linewelder.medus.ui.components.*
 import io.github.linewelder.medus.ui.screens.edittask.EditTaskViewModel.*
 import io.github.linewelder.medus.ui.theme.*
-import java.util.*
+import kotlin.time.*
 
 /** Show the selected task's editable fields and confirm deletion before applying it. */
 @Composable
@@ -198,7 +198,7 @@ private fun EditTaskScreenContent(
 @Composable
 private fun EditTaskScreenPreview() {
     val area = Area(Id.empty(), "Errands")
-    val task = Task(Id.empty(), "Pick up groceries", Date(0), null, area.id)
+    val task = Task(Id.empty(), "Pick up groceries", Instant.fromEpochMilliseconds(0), null, area.id)
     MedusTheme(dynamicColor = false) {
         EditTaskScreenContent(
             taskState = TaskState.Loaded(task),

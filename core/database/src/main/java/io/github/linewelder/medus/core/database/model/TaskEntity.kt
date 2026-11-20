@@ -3,7 +3,7 @@ package io.github.linewelder.medus.core.database.model
 import androidx.room.*
 import io.github.linewelder.medus.core.model.*
 import kotlinx.coroutines.flow.*
-import java.util.*
+import kotlin.time.*
 
 @Entity(
     tableName = "tasks",
@@ -21,8 +21,8 @@ data class TaskEntity(
     @PrimaryKey
     val id: Id<Task>,
     val title: String,
-    val dateCreated: Date,
-    val dateCompleted: Date?,
+    val dateCreated: Instant,
+    val dateCompleted: Instant?,
     val areaId: Id<Area>? = null,
     val timeEstimateMins: Int? = null,
 )
@@ -44,7 +44,7 @@ interface TaskDao {
     suspend fun getTask(id: Id<Task>): TaskEntity?
 
     @Query("UPDATE tasks SET dateCompleted = COALESCE(dateCompleted, :dateCompleted) WHERE id = :id")
-    suspend fun markTaskCompleted(id: Id<Task>, dateCompleted: Date)
+    suspend fun markTaskCompleted(id: Id<Task>, dateCompleted: Instant)
 
     @Query("UPDATE tasks SET dateCompleted = NULL WHERE id = :id")
     suspend fun markTaskIncomplete(id: Id<Task>)
@@ -59,7 +59,7 @@ interface TaskDao {
         id: Id<Task>,
         title: String,
         areaId: Id<Area>?,
-        dateCompleted: Date?,
+        dateCompleted: Instant?,
         timeEstimateMins: Int?,
     )
 

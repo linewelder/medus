@@ -6,8 +6,8 @@ import io.github.linewelder.medus.core.database.*
 import io.github.linewelder.medus.core.database.model.*
 import io.github.linewelder.medus.core.model.*
 import kotlinx.coroutines.flow.*
-import java.util.*
 import javax.inject.*
+import kotlin.time.*
 
 class TaskRepository @Inject constructor(
     private val database: MedusDatabase
@@ -32,7 +32,7 @@ class TaskRepository @Inject constructor(
         if (newArea != null) {
             database.areaDao().insert(newArea)
         }
-        val dateCompleted = if (completed) task.dateCompleted ?: Date() else null
+        val dateCompleted = if (completed) task.dateCompleted ?: Clock.System.now() else null
         database.taskDao().updateTask(id, title, newArea?.id ?: areaId, dateCompleted, timeEstimateMins)
         true
     }
@@ -41,7 +41,7 @@ class TaskRepository @Inject constructor(
 
     suspend fun setTaskCompleted(id: Id<Task>, completed: Boolean) {
         if (completed) {
-            database.taskDao().markTaskCompleted(id, Date())
+            database.taskDao().markTaskCompleted(id, Clock.System.now())
         } else {
             database.taskDao().markTaskIncomplete(id)
         }
@@ -63,7 +63,7 @@ class TaskRepository @Inject constructor(
                 TaskEntity(
                     id = Id.random(),
                     title = title,
-                    dateCreated = Date(),
+                    dateCreated = Clock.System.now(),
                     dateCompleted = null,
                     areaId = area.id,
                     timeEstimateMins = timeEstimateMins,

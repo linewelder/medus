@@ -15,7 +15,7 @@ import androidx.compose.ui.tooling.preview.*
 import androidx.compose.ui.unit.*
 import io.github.linewelder.medus.R
 import io.github.linewelder.medus.core.model.*
-import java.util.*
+import kotlin.time.*
 
 /** Display a task with a completion checkbox and strike through completed titles. */
 @Composable
@@ -114,8 +114,8 @@ private fun TaskListItemPreview() {
                 id = Id.empty(),
                 title = "Do Homework",
                 timeEstimateMins = 60,
-                dateCreated = Date(0),
-                dateCompleted = if (completed) Date(0) else null,
+                dateCreated = Instant.fromEpochMilliseconds(0),
+                dateCompleted = if (completed) Instant.fromEpochMilliseconds(0) else null,
             ),
             onEdit = { },
             onCompletedChange = { completed = it },

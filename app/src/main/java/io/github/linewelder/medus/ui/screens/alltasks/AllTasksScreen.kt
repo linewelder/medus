@@ -16,8 +16,9 @@ import io.github.linewelder.medus.R
 import io.github.linewelder.medus.core.model.*
 import io.github.linewelder.medus.ui.components.*
 import io.github.linewelder.medus.ui.theme.*
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 import java.util.*
+import kotlin.time.*
 
 @Composable
 fun AllTasksScreen(
@@ -133,15 +134,15 @@ private fun AllTasksScreenPreview() {
         Task(
             id = Id(UUID(0, 3)),
             title = "Pick up groceries",
-            dateCreated = Date(0),
+            dateCreated = Instant.fromEpochMilliseconds(0),
             dateCompleted = null,
             areaId = errands.id,
         ),
         Task(
             id = Id(UUID(0, 4)),
             title = "Water the plants",
-            dateCreated = Date(0),
-            dateCompleted = Date(0),
+            dateCreated = Instant.fromEpochMilliseconds(0),
+            dateCompleted = Instant.fromEpochMilliseconds(0),
             areaId = home.id,
         ),
     )
