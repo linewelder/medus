@@ -4,13 +4,15 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.*
-import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.res.*
 import androidx.compose.ui.tooling.preview.*
-import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.*
 import io.github.linewelder.medus.R
 import io.github.linewelder.medus.ui.components.*
 import io.github.linewelder.medus.ui.components.calendar.*
 import io.github.linewelder.medus.ui.theme.*
+import io.github.linewelder.medus.util.*
+import kotlin.time.*
 
 @Composable
 fun HomeScreen(
@@ -54,13 +56,26 @@ private fun HomeScreenContent(
 @Preview
 @Composable
 private fun HomeScreenPreview() {
-    val events = CalendarEventDays(
-        today = listOf(
-            CalendarEvent("School holiday", start = 0L, end = 86_400_000L, allDay = true),
-            CalendarEvent("Pick up groceries", start = 36_000_000L, end = 39_600_000L, allDay = false),
+    val eventsToday = listOf(
+        CalendarEvent(
+            title = "School holiday",
+            start = Instant.fromEpochMilliseconds(0L),
+            end = Instant.fromEpochMilliseconds(86_400_000L),
+            allDay = true,
         ),
-        tomorrow = listOf(
-            CalendarEvent("Dentist appointment", start = 122_400_000L, end = 124_200_000L, allDay = false),
+        CalendarEvent(
+            title = "Pick up groceries",
+            start = Instant.fromEpochMilliseconds(36_000_000L),
+            end = Instant.fromEpochMilliseconds(39_600_000L),
+            allDay = false,
+        ),
+    )
+    val eventsTomorrow = listOf(
+        CalendarEvent(
+            title = "Dentist appointment",
+            start = Instant.fromEpochMilliseconds(122_400_000L),
+            end = Instant.fromEpochMilliseconds(124_200_000L),
+            allDay = false,
         ),
     )
 
@@ -69,7 +84,8 @@ private fun HomeScreenPreview() {
             onNewTask = { },
         ) { modifier ->
             CalendarEventList(
-                events = events,
+                eventsToday = eventsToday,
+                eventsTomorrow = eventsTomorrow,
                 hasCalendarAccess = true,
                 loading = false,
                 onRequestCalendarAccess = {},
