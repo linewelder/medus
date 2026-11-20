@@ -11,6 +11,7 @@ import androidx.navigation.toRoute
 import io.github.linewelder.medus.R
 import io.github.linewelder.medus.ui.screens.alltasks.*
 import io.github.linewelder.medus.ui.screens.createtask.*
+import io.github.linewelder.medus.ui.screens.editchecklist.*
 import io.github.linewelder.medus.ui.screens.edittask.*
 import io.github.linewelder.medus.ui.screens.home.*
 import io.github.linewelder.medus.ui.screens.menu.*
@@ -85,7 +86,12 @@ fun MedusNavigation() {
                 )
             }
             composable<MenuRoute> {
-                MenuScreen()
+                MenuScreen(
+                    onEditChecklist = { navController.navigate(EditChecklistRoute(it.toString())) },
+                )
+            }
+            composable<EditChecklistRoute> {
+                EditChecklistScreen()
             }
             composable<CreateTaskRoute> { entry ->
                 CreateTaskScreen(
@@ -114,3 +120,6 @@ private data class CreateTaskRoute(val areaId: String? = null)
 
 @Serializable
 internal data class EditTaskRoute(val taskId: String)
+
+@Serializable
+internal data class EditChecklistRoute(val checklistId: String)

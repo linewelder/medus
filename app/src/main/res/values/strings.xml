@@ -40,4 +40,13 @@
     <string name="confirm_delete_task">Delete “%1$s”?</string>
     <string name="delete_task_error">Couldn’t delete the task. Try again.</string>
     <string name="new_task">New Task</string>
+    <string name="checklists">Checklists</string>
+    <string name="checklist">Checklist</string>
+    <string name="checklist_morning">Morning</string>
+    <string name="checklist_evening">Evening</string>
+    <string name="checklist_item">Checklist item</string>
+    <string name="new_checklist_item">New item</string>
+    <string name="add_checklist_item">Add item</string>
+    <string name="delete_checklist_item">Delete item</string>
+    <string name="reorder_checklist_item">Reorder item</string>
 </resources>

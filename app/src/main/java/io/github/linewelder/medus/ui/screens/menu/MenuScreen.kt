@@ -1,10 +1,10 @@
 package io.github.linewelder.medus.ui.screens.menu
 
+import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.*
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.res.*
 import androidx.compose.ui.tooling.preview.*
 import androidx.compose.ui.unit.*
@@ -14,13 +14,20 @@ import io.github.linewelder.medus.R
 import io.github.linewelder.medus.core.model.*
 import io.github.linewelder.medus.ui.components.*
 import io.github.linewelder.medus.ui.theme.*
-import java.util.UUID
+import java.util.*
+import kotlin.time.*
 
 @Composable
-fun MenuScreen(viewModel: MenuViewModel = hiltViewModel()) {
+fun MenuScreen(
+    onEditChecklist: (Id<Checklist>) -> Unit,
+    viewModel: MenuViewModel = hiltViewModel(),
+) {
+    val checklists by viewModel.checklists.collectAsStateWithLifecycle(initialValue = emptyList())
     val areas by viewModel.areas.collectAsStateWithLifecycle(initialValue = emptyList())
     val emptyAreaIds by viewModel.emptyAreaIds.collectAsStateWithLifecycle(initialValue = emptySet())
     MenuScreenContent(
+        checklists = checklists,
+        onEditChecklist = onEditChecklist,
         areas = areas,
         emptyAreaIds = emptyAreaIds,
         onMove = { area, newIndex -> viewModel.moveArea(area.id, newIndex) },
@@ -31,6 +38,8 @@ fun MenuScreen(viewModel: MenuViewModel = hiltViewModel()) {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun MenuScreenContent(
+    checklists: List<Checklist>,
+    onEditChecklist: (Id<Checklist>) -> Unit,
     areas: List<Area>,
     emptyAreaIds: Set<Id<Area>>,
     onMove: (Area, Int) -> Unit,
@@ -56,9 +65,7 @@ private fun MenuScreenContent(
                 items = areas,
                 key = { it.id.toString() },
                 onMove = onMove,
-                modifier = Modifier
-                    .fillMaxSize()
-                    .consumeWindowInsets(padding),
+                modifier = Modifier.weight(1f, fill = false),
             ) { area, dragHandle ->
                 Row(
                     modifier = Modifier.height(IntrinsicSize.Min),
@@ -87,6 +94,7 @@ private fun MenuScreenContent(
                     }
                 }
             }
+            ChecklistSection(checklists, onEditChecklist)
         }
     }
 
@@ -117,6 +125,24 @@ private fun MenuScreenContent(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun ChecklistSection(
+    checklists: List<Checklist>,
+    onEditChecklist: (Id<Checklist>) -> Unit,
+) {
+    Column(Modifier.padding(top = 16.dp)) {
+        Text(stringResource(R.string.checklists), style = MaterialTheme.typography.titleLarge)
+        checklists.forEach { checklist ->
+            ListItem(
+                modifier = Modifier.clickable { onEditChecklist(checklist.id) },
+            ) {
+                Text(checklist.role?.displayName() ?: stringResource(R.string.checklist))
+            }
+        }
+    }
+}
+
 @Composable
 private fun AreaDragHandle(
     area: Area,
@@ -142,8 +168,29 @@ private fun MenuScreenPreview() {
         Area(Id(UUID(0, 3)), "Work"),
     )
 
+    val checklists = listOf(
+        Checklist(
+            id = Id.empty(),
+            dateCreated = Instant.fromEpochMilliseconds(0),
+            role = ChecklistRole.Morning,
+            items = listOf(
+                ChecklistItem(Id.empty(), "Brush teeth"),
+            ),
+        ),
+        Checklist(
+            id = Id.empty(),
+            dateCreated = Instant.fromEpochMilliseconds(0),
+            role = ChecklistRole.Evening,
+            items = listOf(
+                ChecklistItem(Id.empty(), "Brush teeth"),
+            ),
+        ),
+    )
+
     MedusTheme(dynamicColor = false) {
         MenuScreenContent(
+            checklists = checklists,
+            onEditChecklist = {},
             areas = areas,
             emptyAreaIds = setOf(areas.first().id),
             onMove = { _, _ -> },

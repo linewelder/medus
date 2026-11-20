@@ -11,7 +11,9 @@ import javax.inject.*
 @HiltViewModel
 class MenuViewModel @Inject constructor(
     private val areaRepository: AreaRepository,
+    checklistRepository: ChecklistRepository,
 ) : ViewModel() {
+    val checklists = checklistRepository.findAll()
     val areas = areaRepository.findAllAreas()
     val emptyAreaIds = areaRepository.findEmptyAreaIds()
 
