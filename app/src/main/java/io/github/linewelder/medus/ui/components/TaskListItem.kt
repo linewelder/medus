@@ -5,9 +5,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.*
-import androidx.compose.ui.geometry.*
 import androidx.compose.ui.graphics.*
-import androidx.compose.ui.layout.*
 import androidx.compose.ui.res.*
 import androidx.compose.ui.semantics.*
 import androidx.compose.ui.text.style.*
@@ -71,36 +69,6 @@ private fun TimeEstimateLabel(minutes: Int) {
             softWrap = false,
         )
     }
-}
-
-@Composable
-private fun ConfettiCheckbox(
-    checked: Boolean,
-    modifier: Modifier = Modifier,
-    onCheckedChange: (Boolean) -> Unit,
-) {
-    var confettiOrigin by remember { mutableStateOf(Offset(0f, 0f)) }
-    val confettiState = LocalConfettiState.current
-
-    Checkbox(
-        modifier = modifier.onGloballyPositioned {
-            val halfSize = it.size / 2
-            confettiOrigin = confettiState.canvasCoordinates.localPositionOf(
-                it,
-                Offset(
-                    halfSize.width.toFloat(),
-                    halfSize.height.toFloat(),
-                ),
-            )
-        },
-        checked = checked,
-        onCheckedChange = { newChecked ->
-            if (newChecked) {
-                confettiState.spawn(confettiOrigin)
-            }
-            onCheckedChange(newChecked)
-        },
-    )
 }
 
 @Preview
