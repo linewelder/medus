@@ -9,7 +9,9 @@ plugins {
 android {
     namespace = "io.github.linewelder.medus"
     compileSdk {
-        version = release(37)
+        version = release(37) {
+            minorApiLevel = 1
+        }
     }
 
     defaultConfig {
