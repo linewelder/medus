@@ -14,7 +14,6 @@ import io.github.linewelder.medus.R
 import io.github.linewelder.medus.core.model.*
 import io.github.linewelder.medus.ui.components.*
 import io.github.linewelder.medus.ui.theme.MedusTheme
-import java.util.UUID
 import kotlin.time.Instant
 
 @Composable
@@ -142,12 +141,12 @@ private fun NewChecklistItemRow(onAdd: (String) -> Unit) {
 @Composable
 private fun EditChecklistScreenPreview() {
     val checklist = Checklist(
-        id = Id(UUID(0, 1)),
+        id = Id.dummy(1),
         dateCreated = Instant.fromEpochMilliseconds(0),
         role = ChecklistRole.Morning,
         items = listOf(
-            ChecklistItem(Id(UUID(0, 2)), "Drink a glass of water"),
-            ChecklistItem(Id(UUID(0, 3)), "Review today's tasks"),
+            ChecklistItem(Id.dummy(2), "Drink a glass of water"),
+            ChecklistItem(Id.dummy(3), "Review today's tasks"),
         ),
     )
 

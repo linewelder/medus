@@ -14,7 +14,6 @@ import io.github.linewelder.medus.R
 import io.github.linewelder.medus.core.model.*
 import io.github.linewelder.medus.ui.components.*
 import io.github.linewelder.medus.ui.theme.*
-import java.util.*
 import kotlin.time.*
 
 @Composable
@@ -163,9 +162,9 @@ private fun AreaDragHandle(
 @Composable
 private fun MenuScreenPreview() {
     val areas = listOf(
-        Area(Id(UUID(0, 1)), "Errands"),
-        Area(Id(UUID(0, 2)), "Home"),
-        Area(Id(UUID(0, 3)), "Work"),
+        Area(Id.dummy(1), "Errands"),
+        Area(Id.dummy(2), "Home"),
+        Area(Id.dummy(3), "Work"),
     )
 
     val checklists = listOf(

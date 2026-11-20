@@ -17,7 +17,6 @@ import io.github.linewelder.medus.core.model.*
 import io.github.linewelder.medus.ui.components.*
 import io.github.linewelder.medus.ui.theme.*
 import kotlinx.coroutines.*
-import java.util.*
 import kotlin.time.*
 
 @Composable
@@ -128,18 +127,18 @@ private fun AllTasksScreenContent(
 @Preview
 @Composable
 private fun AllTasksScreenPreview() {
-    val errands = Area(Id(UUID(0, 1)), "Errands")
-    val home = Area(Id(UUID(0, 2)), "Home")
+    val errands = Area(Id.dummy(1), "Errands")
+    val home = Area(Id.dummy(2), "Home")
     val tasks = listOf(
         Task(
-            id = Id(UUID(0, 3)),
+            id = Id.dummy(3),
             title = "Pick up groceries",
             dateCreated = Instant.fromEpochMilliseconds(0),
             dateCompleted = null,
             areaId = errands.id,
         ),
         Task(
-            id = Id(UUID(0, 4)),
+            id = Id.dummy(4),
             title = "Water the plants",
             dateCreated = Instant.fromEpochMilliseconds(0),
             dateCompleted = Instant.fromEpochMilliseconds(0),
