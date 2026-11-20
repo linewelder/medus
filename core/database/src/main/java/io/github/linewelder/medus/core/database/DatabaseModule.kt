@@ -1,14 +1,13 @@
 package io.github.linewelder.medus.core.database
 
-import android.content.Context
-import androidx.room.Room
-import dagger.Module
-import dagger.Provides
-import dagger.hilt.InstallIn
-import dagger.hilt.android.qualifiers.ApplicationContext
-import dagger.hilt.components.SingletonComponent
+import android.content.*
+import androidx.room.*
+import dagger.*
+import dagger.hilt.*
+import dagger.hilt.android.qualifiers.*
+import dagger.hilt.components.*
 import io.github.linewelder.medus.core.database.migrations.*
-import javax.inject.Singleton
+import javax.inject.*
 
 /** Supplies the application-wide Room database. */
 @Module
@@ -18,7 +17,12 @@ object DatabaseModule {
     @Singleton
     fun provideMedusDatabase(@ApplicationContext context: Context): MedusDatabase =
         Room.databaseBuilder(context, MedusDatabase::class.java, "medus.db")
-            .addMigrations(migration2To3, migration3To4, migration4To5)
+            .addMigrations(
+                migration2To3,
+                migration3To4,
+                migration4To5,
+                migration5To6,
+            )
             .fallbackToDestructiveMigrationFrom(true, 1)
             .build()
 }

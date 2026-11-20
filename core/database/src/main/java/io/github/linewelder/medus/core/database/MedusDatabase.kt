@@ -9,8 +9,10 @@ import io.github.linewelder.medus.core.database.model.*
     entities = [
         TaskEntity::class,
         AreaEntity::class,
+        ChecklistEntity::class,
+        ChecklistItemEntity::class,
     ],
-    version = 5,
+    version = 6,
 )
 @TypeConverters(
     InstantConverter::class,
@@ -18,4 +20,6 @@ import io.github.linewelder.medus.core.database.model.*
 abstract class MedusDatabase : RoomDatabase() {
     abstract fun taskDao(): TaskDao
     abstract fun areaDao(): AreaDao
+    abstract fun checklistDao(): ChecklistDao
+    abstract fun checklistItemDao(): ChecklistItemDao
 }
