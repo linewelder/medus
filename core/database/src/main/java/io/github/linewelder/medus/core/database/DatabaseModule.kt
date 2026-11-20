@@ -7,6 +7,7 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
+import io.github.linewelder.medus.core.database.migrations.*
 import javax.inject.Singleton
 
 /** Supplies the application-wide Room database. */

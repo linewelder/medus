@@ -1,4 +1,4 @@
-package io.github.linewelder.medus.core.database
+package io.github.linewelder.medus.core.database.migrations
 
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
