@@ -42,6 +42,7 @@ Android app (Kotlin, Jetpack Compose, Hilt, Room) for planning daily tasks and e
 - Use extended commit messages for reasoning, not the list of changes. Only add them if the reason is not obvious.
 - Do not sign commits as Co-Authored-By an AI agent.
 - When a change is small and related to a previous one, prefer to amend commit instead of creating a new one.
+- Do not repeat entity names in DAOs and Repositories. Do not call a method `findAreaById` in an `AreaRepository`, use `findById` instead.
 
 ## Workflow
 
