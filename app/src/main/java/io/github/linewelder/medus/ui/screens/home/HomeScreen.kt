@@ -7,8 +7,12 @@ import androidx.compose.ui.*
 import androidx.compose.ui.res.*
 import androidx.compose.ui.tooling.preview.*
 import androidx.compose.ui.unit.*
+import androidx.hilt.lifecycle.viewmodel.compose.*
+import androidx.lifecycle.compose.*
 import io.github.linewelder.medus.R
+import io.github.linewelder.medus.core.model.*
 import io.github.linewelder.medus.ui.components.*
+import io.github.linewelder.medus.ui.components.activechecklist.*
 import io.github.linewelder.medus.ui.components.calendar.*
 import io.github.linewelder.medus.ui.theme.*
 import io.github.linewelder.medus.util.*
@@ -18,17 +22,31 @@ import kotlin.time.*
 fun HomeScreen(
     onNewTask: () -> Unit,
 ) {
+    val viewModel: HomeViewModel = hiltViewModel()
+    val checklist by viewModel.morningChecklist.collectAsStateWithLifecycle(initialValue = null)
+    val startOfToday by viewModel.startOfToday
+        .collectAsStateWithLifecycle(initialValue = Instant.fromEpochMilliseconds(0))
+
+    val activeChecklistContent = @Composable checklist@{ modifier: Modifier ->
+        ActiveChecklist(
+            modifier = modifier,
+            checklist = checklist!!,
+            completionReset = startOfToday,
+        )
+    }
+
     HomeScreenContent(
         onNewTask = onNewTask,
-    ) { modifier ->
-        DeviceCalendarEventList(modifier)
-    }
+        activeChecklistContent = activeChecklistContent.takeIf { checklist != null },
+        calendarContent = { modifier -> DeviceCalendarEventList(modifier) },
+    )
 }
 
 /** Apply the screen background and system insets to the home content. */
 @Composable
 private fun HomeScreenContent(
     onNewTask: () -> Unit,
+    activeChecklistContent: (@Composable (Modifier) -> Unit)?,
     calendarContent: @Composable (Modifier) -> Unit,
 ) {
     Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
@@ -40,6 +58,10 @@ private fun HomeScreenContent(
                 .consumeWindowInsets(innerPadding),
         ) {
             CurrentTimeLabel(Modifier.fillMaxWidth().padding(bottom = 8.dp))
+
+            if (activeChecklistContent != null) {
+                activeChecklistContent(Modifier.fillMaxWidth())
+            }
 
             calendarContent(Modifier.weight(1f).fillMaxWidth())
 
@@ -79,17 +101,53 @@ private fun HomeScreenPreview() {
         ),
     )
 
+    val checklist = Checklist(
+        id = Id.empty(),
+        dateCreated = Instant.fromEpochMilliseconds(0L),
+        role = ChecklistRole.Morning,
+        items = listOf(
+            ChecklistItem(
+                id = Id.empty(),
+                title = "Brush teeth",
+                dateCompleted = Instant.fromEpochMilliseconds(0L),
+            ),
+            ChecklistItem(
+                id = Id.empty(),
+                title = "Make bed",
+                dateCompleted = Instant.fromEpochMilliseconds(110L),
+            ),
+            ChecklistItem(
+                id = Id.empty(),
+                title = "Drink water",
+                dateCompleted = null,
+            ),
+        )
+    )
+
+    val completionReset = Instant.fromEpochMilliseconds(100L)
+
     MedusTheme(dynamicColor = false) {
-        HomeScreenContent(
-            onNewTask = { },
-        ) { modifier ->
-            CalendarEventList(
-                eventsToday = eventsToday,
-                eventsTomorrow = eventsTomorrow,
-                hasCalendarAccess = true,
-                loading = false,
-                onRequestCalendarAccess = {},
-                modifier = modifier,
+        ConfettiOverlay {
+            HomeScreenContent(
+                onNewTask = { },
+                activeChecklistContent = { modifier ->
+                    ActiveChecklistContent(
+                        checklist = checklist,
+                        completionReset = completionReset,
+                        onCheckedChange = { _, _ -> },
+                        modifier = modifier,
+                    )
+                },
+                calendarContent = { modifier ->
+                    CalendarEventList(
+                        eventsToday = eventsToday,
+                        eventsTomorrow = eventsTomorrow,
+                        hasCalendarAccess = true,
+                        loading = false,
+                        onRequestCalendarAccess = {},
+                        modifier = modifier,
+                    )
+                },
             )
         }
     }

@@ -3,6 +3,7 @@ package io.github.linewelder.medus.core.database.dao
 import androidx.room.*
 import io.github.linewelder.medus.core.database.model.*
 import io.github.linewelder.medus.core.model.*
+import kotlin.time.*
 
 @Dao
 abstract class ChecklistItemDao {
@@ -21,6 +22,9 @@ abstract class ChecklistItemDao {
 
     @Query("UPDATE checklist_items SET title = :title WHERE id = :id")
     abstract suspend fun update(id: Id<ChecklistItem>, title: String)
+
+    @Query("UPDATE checklist_items SET dateCompleted = :dateCompleted WHERE id = :id")
+    abstract suspend fun setCompletion(id: Id<ChecklistItem>, dateCompleted: Instant?)
 
     @Transaction
     open suspend fun move(checklistId: Id<Checklist>, id: Id<ChecklistItem>, newIndex: Int) {

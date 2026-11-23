@@ -6,6 +6,7 @@ import io.github.linewelder.medus.core.database.dao.*
 import io.github.linewelder.medus.core.model.*
 import kotlinx.coroutines.flow.*
 import javax.inject.*
+import kotlin.time.*
 
 class ChecklistRepository @Inject constructor(
     database: MedusDatabase,
@@ -28,6 +29,9 @@ class ChecklistRepository @Inject constructor(
     suspend fun removeItem(id: Id<ChecklistItem>) = itemDao.delete(id)
 
     suspend fun updateItem(id: Id<ChecklistItem>, title: String) = itemDao.update(id, title)
+
+    suspend fun setItemCompleted(id: Id<ChecklistItem>, dateCompleted: Instant?) =
+        itemDao.setCompletion(id, dateCompleted)
 
     suspend fun moveItem(checklistId: Id<Checklist>, itemId: Id<ChecklistItem>, newIndex: Int) =
         itemDao.move(checklistId, itemId, newIndex)
