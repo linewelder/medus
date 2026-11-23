@@ -44,56 +44,73 @@ private fun MenuScreenContent(
     onMove: (Area, Int) -> Unit,
     onDeleteArea: (Id<Area>) -> Unit,
 ) {
-    var pendingDeletionId by remember { mutableStateOf<Id<Area>?>(null) }
-    val areaToDelete = areas.firstOrNull { it.id == pendingDeletionId && it.id in emptyAreaIds }
-
     Scaffold( modifier = Modifier.fillMaxSize()) { padding ->
         Column(
             Modifier
                 .fillMaxSize()
                 .padding(padding)
                 .padding(16.dp)
-                .consumeWindowInsets(padding)
+                .consumeWindowInsets(padding),
+            verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
-            Text(
-                stringResource(R.string.areas),
-                style = MaterialTheme.typography.titleLarge,
-            )
+            AreasSection(areas, onMove, emptyAreaIds, onDeleteArea)
 
-            ReorderableList(
-                items = areas,
-                key = { it.id.toString() },
-                onMove = onMove,
-                modifier = Modifier.weight(1f, fill = false),
-            ) { area, dragHandle ->
-                Row(
-                    modifier = Modifier.height(IntrinsicSize.Min),
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    Text(
-                        area.name,
-                        modifier = Modifier
-                            .weight(1f)
-                            .padding(vertical = 8.dp),
-                    )
+            ChecklistSection(checklists, onEditChecklist)
+        }
+    }
+}
 
-                    if (area.id in emptyAreaIds) {
-                        IconButton(
-                            onClick = { pendingDeletionId = area.id },
-                            modifier = Modifier.height(48.dp),
-                        ) {
-                            Icon(
-                                painterResource(R.drawable.ic_delete),
-                                contentDescription = stringResource(R.string.delete_area_named, area.name),
-                            )
-                        }
-                    }
-                    if (areas.size > 1) {
-                        AreaDragHandle(area, dragHandle)
+@Composable
+private fun AreasSection(
+    areas: List<Area>,
+    onMove: (Area, Int) -> Unit,
+    emptyAreaIds: Set<Id<Area>>,
+    onDeleteArea: (Id<Area>) -> Unit,
+) {
+    var pendingDeletionId by remember { mutableStateOf<Id<Area>?>(null) }
+    val areaToDelete = areas.firstOrNull { it.id == pendingDeletionId && it.id in emptyAreaIds }
+
+    Column(Modifier.fillMaxWidth()) {
+        Text(
+            stringResource(R.string.areas),
+            style = MaterialTheme.typography.titleLarge,
+        )
+
+        ReorderableList(
+            items = areas,
+            key = { it.id.toString() },
+            onMove = onMove,
+            modifier = Modifier.weight(1f, fill = false),
+        ) { area, dragHandle ->
+            Row(
+                modifier = Modifier.height(IntrinsicSize.Min),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Text(
+                    area.name,
+                    modifier = Modifier
+                        .weight(1f)
+                        .padding(vertical = 8.dp),
+                )
+
+                if (area.id in emptyAreaIds) {
+                    IconButton(
+                        onClick = { pendingDeletionId = area.id },
+                        modifier = Modifier.height(48.dp),
+                    ) {
+                        Icon(
+                            painterResource(R.drawable.ic_delete),
+                            contentDescription = stringResource(
+                                R.string.delete_area_named,
+                                area.name
+                            ),
+                        )
                     }
                 }
+                if (areas.size > 1) {
+                    AreaDragHandle(area, dragHandle)
+                }
             }
-            ChecklistSection(checklists, onEditChecklist)
         }
     }
 
@@ -124,24 +141,6 @@ private fun MenuScreenContent(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-private fun ChecklistSection(
-    checklists: List<Checklist>,
-    onEditChecklist: (Id<Checklist>) -> Unit,
-) {
-    Column(Modifier.padding(top = 16.dp)) {
-        Text(stringResource(R.string.checklists), style = MaterialTheme.typography.titleLarge)
-        checklists.forEach { checklist ->
-            ListItem(
-                modifier = Modifier.clickable { onEditChecklist(checklist.id) },
-            ) {
-                Text(checklist.role?.displayName() ?: stringResource(R.string.checklist))
-            }
-        }
-    }
-}
-
 @Composable
 private fun AreaDragHandle(
     area: Area,
@@ -155,6 +154,26 @@ private fun AreaDragHandle(
             painterResource(R.drawable.ic_drag_handle),
             contentDescription = stringResource(R.string.reorder_area, area.name),
         )
+    }
+}
+
+@Composable
+private fun ChecklistSection(
+    checklists: List<Checklist>,
+    onEditChecklist: (Id<Checklist>) -> Unit,
+) {
+    Column(Modifier.fillMaxWidth()) {
+        Text(stringResource(R.string.checklists), style = MaterialTheme.typography.titleLarge)
+        checklists.forEach { checklist ->
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 8.dp)
+                    .clickable { onEditChecklist(checklist.id) },
+            ) {
+                Text(checklist.role?.displayName() ?: stringResource(R.string.checklist))
+            }
+        }
     }
 }
 
