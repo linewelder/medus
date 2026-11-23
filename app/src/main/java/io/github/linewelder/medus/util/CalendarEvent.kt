@@ -2,8 +2,8 @@ package io.github.linewelder.medus.util
 
 import android.content.*
 import android.provider.CalendarContract.*
-import kotlin.time.*
-import java.util.*
+import kotlinx.datetime.*
+import kotlin.time.Instant
 
 data class CalendarEvent(
     val title: String?,
@@ -12,26 +12,17 @@ data class CalendarEvent(
     val allDay: Boolean,
 )
 
-fun readCalendarEvents(resolver: ContentResolver, date: Calendar): List<CalendarEvent>? {
-    val year = date.get(Calendar.YEAR)
-    val month = date.get(Calendar.MONTH)
-    val day = date.get(Calendar.DAY_OF_MONTH)
+/** Read device calendar events for the requested day. */
+fun readCalendarEvents(resolver: ContentResolver, date: LocalDate): List<CalendarEvent>? {
+    val nextDate = date.plus(1, DateTimeUnit.DAY)
 
-    /**
-     * Get the start and the end of today's date in the given time zone
-     * as milliseconds since the Unix Epoch.
-     */
-    fun dayBoundaries(timeZone: TimeZone): List<Long> {
-        val calendar = Calendar.getInstance(timeZone)
-        return List(2) { dayOffset ->
-            calendar.clear()
-            calendar.set(year, month, day + dayOffset)
-            calendar.timeInMillis
-        }
-    }
+    fun dayBoundaries(timeZone: TimeZone) = listOf(
+        date.atStartOfDayIn(timeZone).toEpochMilliseconds(),
+        nextDate.atStartOfDayIn(timeZone).toEpochMilliseconds(),
+    )
 
-    val localBoundaries = dayBoundaries(date.timeZone)
-    val allDayBoundaries = dayBoundaries(TimeZone.getTimeZone("UTC"))
+    val localBoundaries = dayBoundaries(TimeZone.currentSystemDefault())
+    val allDayBoundaries = dayBoundaries(TimeZone.UTC)
 
     val fields = arrayOf(Events.TITLE, Instances.BEGIN, Instances.END, Events.ALL_DAY)
     val occurrences = try {

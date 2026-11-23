@@ -20,13 +20,15 @@ import androidx.lifecycle.compose.*
 import io.github.linewelder.medus.R
 import io.github.linewelder.medus.ui.theme.*
 import io.github.linewelder.medus.util.*
-import kotlin.time.*
+import kotlinx.datetime.*
+import kotlin.time.Instant
 
 /** Connect the calendar list to runtime permissions and live calendar state. */
 @Composable
-internal fun DeviceCalendarEventList(
+internal fun CalendarEventList(
+    date: LocalDate,
     modifier: Modifier = Modifier,
-    viewModel: CalendarEventsViewModel = hiltViewModel(),
+    viewModel: CalendarEventsViewModel = hiltViewModel(key = "CalendarEvents:$date"),
 ) {
     val context = LocalContext.current
     val permission = Manifest.permission.READ_CALENDAR
@@ -40,19 +42,22 @@ internal fun DeviceCalendarEventList(
         ActivityResultContracts.RequestPermission(),
     ) { granted ->
         hasCalendarAccess = granted
-        viewModel.refresh(granted)
     }
 
     LifecycleResumeEffect(context) {
         hasCalendarAccess = ContextCompat.checkSelfPermission(context, permission) ==
             PackageManager.PERMISSION_GRANTED
-        viewModel.refresh(hasCalendarAccess)
         onPauseOrDispose {}
     }
 
-    CalendarEventList(
-        eventsToday = calendarState.eventsToday,
-        eventsTomorrow = calendarState.eventsTomorrow,
+    LaunchedEffect(hasCalendarAccess, date, viewModel) {
+        if (hasCalendarAccess) {
+            viewModel.loadEvents(date)
+        }
+    }
+
+    CalendarEventListContent(
+        events = calendarState.events,
         hasCalendarAccess = hasCalendarAccess,
         loading = calendarState.loading,
         onRequestCalendarAccess = { requestCalendarAccess.launch(permission) },
@@ -62,9 +67,8 @@ internal fun DeviceCalendarEventList(
 
 /** Render the calendar list for the supplied permission, loading, and event data. */
 @Composable
-internal fun CalendarEventList(
-    eventsToday: List<CalendarEvent>?,
-    eventsTomorrow: List<CalendarEvent>?,
+internal fun CalendarEventListContent(
+    events: List<CalendarEvent>?,
     hasCalendarAccess: Boolean,
     loading: Boolean,
     onRequestCalendarAccess: () -> Unit,
@@ -72,70 +76,54 @@ internal fun CalendarEventList(
 ) {
     when {
         !hasCalendarAccess -> Column {
-            Text(stringResource(R.string.home_calendar_permission))
+            Text(stringResource(R.string.calendar_permission))
             Button(onClick = onRequestCalendarAccess) {
-                Text(stringResource(R.string.home_allow_calendar_access))
+                Text(stringResource(R.string.allow_calendar_access))
             }
         }
 
-        eventsToday == null && eventsTomorrow == null ->
+        events == null ->
             if (loading) {
                 CircularProgressIndicator()
             } else {
-                Text(stringResource(R.string.home_calendar_unavailable))
+                Text(stringResource(R.string.calendar_unavailable))
             }
 
-        else -> LazyColumn(
-            modifier = modifier,
-            verticalArrangement = Arrangement.spacedBy(12.dp),
-        ) {
-            item {
-                Text(stringResource(R.string.home_today_events), style = MaterialTheme.typography.titleLarge)
-            }
-            calendarEventRows(eventsToday.orEmpty(), R.string.home_no_events)
-
-            item {
-                Text(
-                    stringResource(R.string.home_tomorrow_events),
-                    modifier = Modifier.padding(top = 8.dp),
-                    style = MaterialTheme.typography.titleLarge,
-                )
-            }
-            calendarEventRows(eventsTomorrow.orEmpty(), R.string.home_no_tomorrow_events)
-        }
-    }
-}
-
-/** Add the day's event rows or its empty message to the shared list. */
-private fun LazyListScope.calendarEventRows(events: List<CalendarEvent>, emptyMessage: Int) {
-    if (events.isEmpty()) {
-        item { Text(stringResource(emptyMessage)) }
-    } else {
-        items(events) { event ->
-            val timeFrame = if (event.allDay) {
-                stringResource(R.string.home_all_day)
+        else -> LazyColumn(modifier = modifier) {
+            if (events.isEmpty()) {
+                item { Text(stringResource(R.string.no_events)) }
             } else {
-                DateUtils.formatDateRange(
-                    LocalContext.current,
-                    event.start.toEpochMilliseconds(),
-                    event.end.toEpochMilliseconds(),
-                    DateUtils.FORMAT_SHOW_TIME,
-                )
-            }
-            Column {
-                Text(event.title ?: stringResource(R.string.home_untitled_event))
-                Text(timeFrame, style = MaterialTheme.typography.bodySmall)
+                items(events) { CalendarEventDisplay(it) }
             }
         }
     }
 }
 
-@Preview
 @Composable
-private fun CalendarEventListPreview() {
+private fun CalendarEventDisplay(event: CalendarEvent) {
+    val timeFrame = if (event.allDay) {
+        stringResource(R.string.event_all_day)
+    } else {
+        DateUtils.formatDateRange(
+            LocalContext.current,
+            event.start.toEpochMilliseconds(),
+            event.end.toEpochMilliseconds(),
+            DateUtils.FORMAT_SHOW_TIME,
+        )
+    }
+
+    Column(Modifier.padding(vertical = 8.dp)) {
+        Text(event.title ?: stringResource(R.string.untitled_event))
+        Text(timeFrame, style = MaterialTheme.typography.bodySmall)
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun CalendarEventListContentPreview() {
     MedusTheme(dynamicColor = false) {
-        CalendarEventList(
-            eventsToday = listOf(
+        CalendarEventListContent(
+            events = listOf(
                 CalendarEvent(
                     title = "School holiday",
                     start = Instant.fromEpochMilliseconds(0L),
@@ -146,14 +134,6 @@ private fun CalendarEventListPreview() {
                     title = "Pick up groceries",
                     start = Instant.fromEpochMilliseconds(36_000_000L),
                     end = Instant.fromEpochMilliseconds(39_600_000L),
-                    allDay = false,
-                ),
-            ),
-            eventsTomorrow = listOf(
-                CalendarEvent(
-                    title = "Dentist appointment",
-                    start = Instant.fromEpochMilliseconds(122_400_000L),
-                    end = Instant.fromEpochMilliseconds(124_200_000L),
                     allDay = false,
                 ),
             ),

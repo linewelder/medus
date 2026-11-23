@@ -7,14 +7,13 @@ import dagger.hilt.android.qualifiers.*
 import io.github.linewelder.medus.util.*
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
-import java.util.*
+import kotlinx.datetime.*
 import javax.inject.*
 
 /** The current result of reading the upcoming calendar events. */
 internal data class CalendarEventsState(
     val loading: Boolean = false,
-    val eventsToday: List<CalendarEvent>? = null,
-    val eventsTomorrow: List<CalendarEvent>? = null,
+    val events: List<CalendarEvent>? = null,
 )
 
 /** Load upcoming calendar events off the main thread and expose the result to the UI. */
@@ -27,29 +26,20 @@ internal class CalendarEventsViewModel @Inject constructor(
 
     val state = calendarState.asStateFlow()
 
-    /** Refresh calendar event list. */
-    fun refresh(hasCalendarAccess: Boolean) {
-        if (!hasCalendarAccess) return
-
+    /** Load the device calendar events for the requested day. */
+    fun loadEvents(date: LocalDate) {
         refreshJob?.cancel()
         refreshJob = null
 
         calendarState.update { it.copy(loading = true) }
 
         refreshJob = viewModelScope.launch {
-            val eventsToday = withContext(Dispatchers.IO) {
-                val today = Calendar.getInstance()
-                readCalendarEvents(context.contentResolver, today)
-            }
-            val eventsTomorrow = withContext(Dispatchers.IO) {
-                val tomorrow = Calendar.getInstance()
-                tomorrow.add(Calendar.DAY_OF_MONTH, 1)
-                readCalendarEvents(context.contentResolver, tomorrow)
+            val events = withContext(Dispatchers.IO) {
+                readCalendarEvents(context.contentResolver, date)
             }
             calendarState.value = CalendarEventsState(
                 loading = false,
-                eventsToday = eventsToday,
-                eventsTomorrow = eventsTomorrow,
+                events = events,
             )
         }
     }
