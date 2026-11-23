@@ -1,5 +1,7 @@
 package io.github.linewelder.medus.ui.screens.home
 
+import androidx.compose.animation.*
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -37,16 +39,22 @@ fun HomeScreen(
 
     HomeScreenContent(
         onNewTask = onNewTask,
-        activeChecklistContent = activeChecklistContent.takeIf { checklist != null },
+        activeChecklist = checklist,
+        startOfToday = startOfToday,
+        activeChecklistContent = activeChecklistContent,
         calendarContent = { modifier -> DeviceCalendarEventList(modifier) },
     )
 }
 
-/** Apply the screen background and system insets to the home content. */
+/**
+ * @param activeChecklistContent Is only composed if [activeChecklist] is not null
+ */
 @Composable
 private fun HomeScreenContent(
     onNewTask: () -> Unit,
-    activeChecklistContent: (@Composable (Modifier) -> Unit)?,
+    activeChecklist: Checklist?,
+    startOfToday: Instant,
+    activeChecklistContent: (@Composable (Modifier) -> Unit),
     calendarContent: @Composable (Modifier) -> Unit,
 ) {
     Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
@@ -59,8 +67,18 @@ private fun HomeScreenContent(
         ) {
             CurrentTimeLabel(Modifier.fillMaxWidth().padding(bottom = 8.dp))
 
-            if (activeChecklistContent != null) {
-                activeChecklistContent(Modifier.fillMaxWidth())
+            if (activeChecklist != null) {
+                fun <T> animationSpec() = tween<T>(
+                    durationMillis = 500,
+                    delayMillis = 200,
+                )
+
+                AnimatedVisibility(
+                    visible = !activeChecklist.isCompleted(startOfToday),
+                    exit = fadeOut(animationSpec()) + shrinkVertically(animationSpec()),
+                ) {
+                    activeChecklistContent(Modifier.fillMaxWidth())
+                }
             }
 
             calendarContent(Modifier.weight(1f).fillMaxWidth())
@@ -130,6 +148,8 @@ private fun HomeScreenPreview() {
         ConfettiOverlay {
             HomeScreenContent(
                 onNewTask = { },
+                activeChecklist = checklist,
+                startOfToday = completionReset,
                 activeChecklistContent = { modifier ->
                     ActiveChecklistContent(
                         checklist = checklist,
