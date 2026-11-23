@@ -147,12 +147,14 @@ private fun AllTasksScreenPreview() {
     )
 
     MedusTheme(dynamicColor = false) {
-        AllTasksScreenContent(
-            tasks = tasks,
-            areas = listOf(errands, home),
-            onCreateTask = {},
-            onEditTask = {},
-            onTaskCompletedChange = { _, _ -> },
-        )
+        ConfettiOverlay {
+            AllTasksScreenContent(
+                tasks = tasks,
+                areas = listOf(errands, home),
+                onCreateTask = {},
+                onEditTask = {},
+                onTaskCompletedChange = { _, _ -> },
+            )
+        }
     }
 }
