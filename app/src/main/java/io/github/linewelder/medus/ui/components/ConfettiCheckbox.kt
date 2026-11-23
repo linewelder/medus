@@ -13,12 +13,22 @@ import androidx.compose.ui.layout.*
 @Composable
 fun ConfettiCheckbox(
     checked: Boolean,
-    onCheckedChange: (Boolean) -> Unit,
     modifier: Modifier = Modifier,
+    onCheckedChange: ((Boolean) -> Unit)? = null,
     celebrateOnCheck: Boolean = true,
 ) {
     var confettiOrigin by remember { mutableStateOf(Offset(0f, 0f)) }
     val confettiState = LocalConfettiState.current
+
+    var previousChecked by remember { mutableStateOf(checked) }
+    LaunchedEffect(checked) {
+        if (checked == previousChecked) return@LaunchedEffect
+        previousChecked = checked
+
+        if (checked && celebrateOnCheck) {
+            confettiState.spawn(confettiOrigin)
+        }
+    }
 
     Checkbox(
         modifier = modifier.onGloballyPositioned {
@@ -32,11 +42,6 @@ fun ConfettiCheckbox(
             )
         },
         checked = checked,
-        onCheckedChange = { newChecked ->
-            if (newChecked && celebrateOnCheck) {
-                confettiState.spawn(confettiOrigin)
-            }
-            onCheckedChange(newChecked)
-        },
+        onCheckedChange = onCheckedChange,
     )
 }
