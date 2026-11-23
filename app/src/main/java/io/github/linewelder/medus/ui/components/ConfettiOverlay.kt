@@ -170,7 +170,7 @@ class ConfettiState {
  * Provides
  */
 val LocalConfettiState = staticCompositionLocalOf<ConfettiState> {
-    error("ConfettiState has not been provided")
+    error("Can only use ConfettiState in content wrapped with ConfettiOverlay")
 }
 
 internal data class Particle(
