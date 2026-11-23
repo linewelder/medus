@@ -17,6 +17,7 @@ import io.github.linewelder.medus.core.model.*
 import io.github.linewelder.medus.ui.components.*
 import io.github.linewelder.medus.ui.theme.*
 import kotlinx.coroutines.*
+import kotlin.math.*
 import kotlin.time.*
 
 @Composable
@@ -93,7 +94,14 @@ private fun AllTasksScreenContent(
                     selectedOptionId = areaOptions[selectedOptionIndex].id,
                     onOptionSelected = { optionId ->
                         val page = areaOptions.indexOfFirst { it.id == optionId }
-                        scope.launch { pagerState.animateScrollToPage(page) }
+                        scope.launch {
+                            val pageDistance = abs(page - pagerState.currentPage)
+                            if (pageDistance <= 1) {
+                                pagerState.animateScrollToPage(page)
+                            } else {
+                                pagerState.scrollToPage(page)
+                            }
+                        }
                     },
                     modifier = Modifier.fillMaxWidth(),
                     contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
