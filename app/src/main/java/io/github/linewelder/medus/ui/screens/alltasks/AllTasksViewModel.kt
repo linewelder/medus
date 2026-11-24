@@ -16,7 +16,7 @@ class AllTasksViewModel @Inject constructor(
     private val actionHistory: ActionHistory,
 ) : ViewModel() {
     val tasks = taskRepository.findAll()
-    val areas = areaRepository.findAll()
+    val areas = areaRepository.findAllWithTaskCounts()
 
     fun setTaskCompleted(task: Task, completed: Boolean) {
         viewModelScope.launch {

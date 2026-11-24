@@ -13,6 +13,7 @@ import androidx.compose.ui.unit.*
 import androidx.hilt.lifecycle.viewmodel.compose.*
 import androidx.lifecycle.compose.*
 import io.github.linewelder.medus.R
+import io.github.linewelder.medus.core.data.repositories.AreaWithTaskCount
 import io.github.linewelder.medus.core.model.*
 import io.github.linewelder.medus.ui.components.*
 import io.github.linewelder.medus.ui.theme.*
@@ -37,22 +38,31 @@ fun AllTasksScreen(
     )
 }
 
-data class AreaChooserOption(val id: String, val label: String)
+data class AreaChooserOption(val id: String, val label: String, val numUncompleted: Int)
 
 @Composable
 private fun AllTasksScreenContent(
     tasks: List<Task>,
-    areas: List<Area>?,
+    areas: List<AreaWithTaskCount>?,
     onCreateTask: (Id<Area>?) -> Unit,
     onEditTask: (Id<Task>) -> Unit,
     onTaskCompletedChange: (Task, Boolean) -> Unit,
 ) {
     var savedOptionId by rememberSaveable { mutableStateOf("") }
 
-    val allAreasOption = AreaChooserOption(id = "", label = stringResource(R.string.all_areas))
-    val areaOptions = listOf(allAreasOption) + areas.orEmpty().map { area ->
-        AreaChooserOption(id = area.id.toString(), label = area.name)
+    val allAreasOption = AreaChooserOption(
+        id = "",
+        label = stringResource(R.string.all_areas),
+        numUncompleted = areas?.sumOf { it.uncompletedTaskCount } ?: 0,
+    )
+    val areaOptions = listOf(allAreasOption) + areas.orEmpty().map {
+        AreaChooserOption(
+            id = it.area.id.toString(),
+            label = it.area.name,
+            numUncompleted = it.uncompletedTaskCount,
+        )
     }
+
     val pageCount by rememberUpdatedState(areaOptions.size)
     val pagerState = if (areas != null) {
         remember {
@@ -63,7 +73,7 @@ private fun AllTasksScreenContent(
         null
     }
     val selectedOptionIndex = (pagerState?.currentPage ?: 0).coerceAtMost(areaOptions.lastIndex)
-    val selectedAreaId = areas?.getOrNull(selectedOptionIndex - 1)?.id
+    val selectedAreaId = areas?.getOrNull(selectedOptionIndex - 1)?.area?.id
 
     Scaffold(
         modifier = Modifier.fillMaxSize(),
@@ -108,6 +118,15 @@ private fun AllTasksScreenContent(
                     state = chooserState,
                 ) { option ->
                     Text(option.label, maxLines = 1)
+                    if (option.numUncompleted > 0) {
+                        Badge(
+                            modifier = Modifier.padding(start = 6.dp),
+                            containerColor = LocalContentColor.current,
+                            contentColor = MaterialTheme.colorScheme.surface,
+                        ) {
+                            Text(option.numUncompleted.toString())
+                        }
+                    }
                 }
 
                 HorizontalPager(
@@ -115,7 +134,7 @@ private fun AllTasksScreenContent(
                     modifier = Modifier.fillMaxWidth().weight(1f),
                     key = { areaOptions[it].id },
                 ) { page ->
-                    val area = areas.getOrNull(page - 1)
+                    val area = areas.getOrNull(page - 1)?.area
                     val visibleTasks = if (area == null) tasks else tasks.filter { it.areaId == area.id }
                     LazyColumn(
                         modifier = Modifier.fillMaxSize(),
@@ -138,22 +157,29 @@ private fun AllTasksScreenContent(
 @Preview
 @Composable
 private fun AllTasksScreenPreview() {
-    val errands = Area(Id.dummy(1), "Errands")
-    val home = Area(Id.dummy(2), "Home")
+    val errands = AreaWithTaskCount(
+        Area(Id.dummy(1), "Errands"),
+        uncompletedTaskCount = 0,
+    )
+    val home = AreaWithTaskCount(
+        Area(Id.dummy(2), "Home"),
+        uncompletedTaskCount = 2,
+    )
+
     val tasks = listOf(
         Task(
             id = Id.dummy(3),
             title = "Pick up groceries",
             dateCreated = Instant.fromEpochMilliseconds(0),
             dateCompleted = null,
-            areaId = errands.id,
+            areaId = errands.area.id,
         ),
         Task(
             id = Id.dummy(4),
             title = "Water the plants",
             dateCreated = Instant.fromEpochMilliseconds(0),
             dateCompleted = Instant.fromEpochMilliseconds(0),
-            areaId = home.id,
+            areaId = home.area.id,
         ),
     )
 
