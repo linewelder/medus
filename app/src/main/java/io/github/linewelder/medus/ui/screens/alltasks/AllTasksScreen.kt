@@ -43,7 +43,7 @@ private fun AllTasksScreenContent(
     areas: List<Area>?,
     onCreateTask: (Id<Area>?) -> Unit,
     onEditTask: (Id<Task>) -> Unit,
-    onTaskCompletedChange: (Id<Task>, Boolean) -> Unit,
+    onTaskCompletedChange: (Task, Boolean) -> Unit,
 ) {
     var savedOptionId by rememberSaveable { mutableStateOf("") }
 
@@ -122,7 +122,7 @@ private fun AllTasksScreenContent(
                             TaskListItem(
                                 task = task,
                                 onEdit = { onEditTask(task.id) },
-                                onCompletedChange = { onTaskCompletedChange(task.id, it) },
+                                onCompletedChange = { onTaskCompletedChange(task, it) },
                             )
                         }
                     }

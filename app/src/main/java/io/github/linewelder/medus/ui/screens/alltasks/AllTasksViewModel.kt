@@ -4,6 +4,8 @@ import androidx.lifecycle.*
 import dagger.hilt.android.lifecycle.*
 import io.github.linewelder.medus.core.data.repositories.*
 import io.github.linewelder.medus.core.model.*
+import io.github.linewelder.medus.ui.*
+import io.github.linewelder.medus.ui.actions.*
 import kotlinx.coroutines.*
 import javax.inject.*
 
@@ -11,13 +13,17 @@ import javax.inject.*
 class AllTasksViewModel @Inject constructor(
     private val taskRepository: TaskRepository,
     private val areaRepository: AreaRepository,
+    private val actionHistory: ActionHistory,
 ) : ViewModel() {
     val tasks = taskRepository.findAllTasks()
     val areas = areaRepository.findAllAreas()
 
-    fun setTaskCompleted(id: Id<Task>, completed: Boolean) {
+    fun setTaskCompleted(task: Task, completed: Boolean) {
         viewModelScope.launch {
-            taskRepository.setTaskCompleted(id, completed)
+            taskRepository.setTaskCompleted(task.id, completed)
+            if (completed) {
+                actionHistory.commit(TaskCompletedAction(taskRepository, task))
+            }
         }
     }
 }

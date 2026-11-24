@@ -30,6 +30,7 @@
     <string name="save_task_error">Couldn’t save the task. Try again.</string>
     <string name="edit_task">Edit task</string>
     <string name="task_completed">Completed</string>
+    <string name="action_task_completed">Completed “%1$s”</string>
     <string name="undo">Undo</string>
     <string name="task_completion_for_title">Completion for %1$s</string>
     <string name="task_unavailable">Couldn’t open this task.</string>
