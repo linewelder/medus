@@ -2,9 +2,11 @@ package io.github.linewelder.medus.ui.components.activechecklist
 
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.selection.toggleable
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.*
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.*
 import androidx.compose.ui.tooling.preview.*
@@ -41,7 +43,7 @@ internal fun ActiveChecklistContent(
     onCheckedChange: (Id<ChecklistItem>, Boolean) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val checklistCompleted = checklist.isCompleted(completionReset)
+    val oneItemLeft = checklist.items.count { !it.isCompleted(completionReset) } == 1
 
     Column(modifier) {
         Text(
@@ -53,17 +55,26 @@ internal fun ActiveChecklistContent(
             key(item.id) {
                 val checked = item.isCompleted(completionReset)
 
+                val confetti = rememberConfettiAnchor()
                 Row(
                     modifier = Modifier
-                        .clickable { onCheckedChange(item.id, !checked) }
+                        .toggleable(
+                            value = checked,
+                            role = Role.Checkbox,
+                            onValueChange = { newChecked ->
+                                if (newChecked && oneItemLeft) confetti.spawn()
+                                onCheckedChange(item.id, newChecked)
+                            },
+                        )
                         .padding(vertical = 8.dp),
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
                     Text(item.title, modifier = Modifier.weight(1f))
-                    ConfettiCheckbox(
+                    Checkbox(
                         checked = checked,
-                        modifier = Modifier.semantics { contentDescription = item.title },
-                        celebrateOnCheck = checklistCompleted,
+                        onCheckedChange = null,
+                        modifier = confetti.modifier
+                            .semantics { contentDescription = item.title },
                     )
                 }
             }

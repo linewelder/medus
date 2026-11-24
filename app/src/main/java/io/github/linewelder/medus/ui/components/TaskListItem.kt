@@ -45,13 +45,17 @@ fun TaskListItem(task: Task, onEdit: () -> Unit, onCompletedChange: (Boolean) ->
                 task.timeEstimateMins?.let { TimeEstimateLabel(it) }
             }
         }
+        val confetti = rememberConfettiAnchor()
         val completionLabel = stringResource(R.string.task_completion_for_title, task.title)
-        ConfettiCheckbox(
+        Checkbox(
             checked = completed,
-            modifier = Modifier
+            modifier = confetti.modifier
                 .sizeIn(minWidth = 56.dp, minHeight = 48.dp)
                 .semantics { contentDescription = completionLabel },
-            onCheckedChange = onCompletedChange,
+            onCheckedChange = {
+                if (it) confetti.spawn()
+                onCompletedChange(it)
+            },
         )
     }
 }
