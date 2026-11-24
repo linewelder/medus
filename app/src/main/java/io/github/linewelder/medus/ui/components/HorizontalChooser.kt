@@ -7,17 +7,17 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.*
 import androidx.compose.ui.unit.*
 
-data class HorizontalChooserOption(val id: String, val label: String)
-
 /** Display options as a horizontally scrollable row with a single selection. */
 @Composable
-fun HorizontalChooser(
-    options: List<HorizontalChooserOption>,
-    selectedOptionId: String,
-    onOptionSelected: (String) -> Unit,
+fun <T> HorizontalChooser(
+    options: List<T>,
+    selectedKey: Any,
+    key: (T) -> Any,
+    onOptionSelected: (T) -> Unit,
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(0.dp),
     state: LazyListState = rememberLazyListState(),
+    itemContent: @Composable (T) -> Unit,
 ) {
     LazyRow(
         modifier = modifier,
@@ -25,11 +25,11 @@ fun HorizontalChooser(
         contentPadding = contentPadding,
         horizontalArrangement = Arrangement.spacedBy(8.dp),
     ) {
-        items(options, key = { it.id }) { option ->
+        items(options, key = key) { option ->
             FilterChip(
-                selected = option.id == selectedOptionId,
-                onClick = { onOptionSelected(option.id) },
-                label = { Text(option.label, maxLines = 1) },
+                selected = key(option) == selectedKey,
+                onClick = { onOptionSelected(option) },
+                label = { itemContent(option) },
             )
         }
     }

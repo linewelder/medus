@@ -37,6 +37,8 @@ fun AllTasksScreen(
     )
 }
 
+data class AreaChooserOption(val id: String, val label: String)
+
 @Composable
 private fun AllTasksScreenContent(
     tasks: List<Task>,
@@ -47,12 +49,9 @@ private fun AllTasksScreenContent(
 ) {
     var savedOptionId by rememberSaveable { mutableStateOf("") }
 
-    val allAreasOption = HorizontalChooserOption(
-        id = "",
-        label = stringResource(R.string.all_areas),
-    )
+    val allAreasOption = AreaChooserOption(id = "", label = stringResource(R.string.all_areas))
     val areaOptions = listOf(allAreasOption) + areas.orEmpty().map { area ->
-        HorizontalChooserOption(id = area.id.toString(), label = area.name)
+        AreaChooserOption(id = area.id.toString(), label = area.name)
     }
     val pageCount by rememberUpdatedState(areaOptions.size)
     val pagerState = if (areas != null) {
@@ -91,9 +90,10 @@ private fun AllTasksScreenContent(
 
                 HorizontalChooser(
                     options = areaOptions,
-                    selectedOptionId = areaOptions[selectedOptionIndex].id,
-                    onOptionSelected = { optionId ->
-                        val page = areaOptions.indexOfFirst { it.id == optionId }
+                    selectedKey = areaOptions[selectedOptionIndex].id,
+                    key = { it.id },
+                    onOptionSelected = { page ->
+                        val page = areaOptions.indexOf(page)
                         scope.launch {
                             val pageDistance = abs(page - pagerState.currentPage)
                             if (pageDistance <= 1) {
@@ -106,7 +106,10 @@ private fun AllTasksScreenContent(
                     modifier = Modifier.fillMaxWidth(),
                     contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
                     state = chooserState,
-                )
+                ) { option ->
+                    Text(option.label, maxLines = 1)
+                }
+
                 HorizontalPager(
                     state = pagerState,
                     modifier = Modifier.fillMaxWidth().weight(1f),
