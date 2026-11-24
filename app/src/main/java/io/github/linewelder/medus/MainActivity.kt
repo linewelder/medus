@@ -7,16 +7,19 @@ import dagger.hilt.android.*
 import io.github.linewelder.medus.ui.*
 import io.github.linewelder.medus.ui.components.*
 import io.github.linewelder.medus.ui.theme.*
+import javax.inject.*
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
+    @Inject lateinit var actionHistory: ActionHistory
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
             MedusTheme {
                 ConfettiOverlay {
-                    MedusNavigation()
+                    MedusNavigation(actionHistory)
                 }
             }
         }

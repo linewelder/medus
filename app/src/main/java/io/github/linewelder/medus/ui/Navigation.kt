@@ -5,9 +5,9 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.*
 import androidx.compose.ui.res.*
+import androidx.navigation.*
 import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.compose.*
-import androidx.navigation.toRoute
 import io.github.linewelder.medus.R
 import io.github.linewelder.medus.ui.screens.alltasks.*
 import io.github.linewelder.medus.ui.screens.createtask.*
@@ -18,7 +18,7 @@ import io.github.linewelder.medus.ui.screens.menu.*
 import kotlinx.serialization.*
 
 @Composable
-fun MedusNavigation() {
+fun MedusNavigation(actionHistory: ActionHistory) {
     val navController = rememberNavController()
     val backStackEntry by navController.currentBackStackEntryAsState()
     val destination = backStackEntry?.destination
@@ -26,11 +26,18 @@ fun MedusNavigation() {
     val isHome = destination?.hasRoute<HomeRoute>() == true
     val isTasks = destination?.hasRoute<AllTasksRoute>() == true
     val isMenu = destination?.hasRoute<MenuRoute>() == true
+    val showBottomBar = isHome || isTasks || isMenu
 
     Scaffold(
         contentWindowInsets = WindowInsets(0, 0, 0, 0),
+        snackbarHost = {
+            ActionHistorySnackbarHost(
+                actionHistory,
+                modifier = if (showBottomBar) Modifier else Modifier.navigationBarsPadding(),
+            )
+        },
         bottomBar = {
-            if (!isHome && !isTasks && !isMenu) return@Scaffold
+            if (!showBottomBar) return@Scaffold
 
             NavigationBar {
                 NavigationBarItem(
