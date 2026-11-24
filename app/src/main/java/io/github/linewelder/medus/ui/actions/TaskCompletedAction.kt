@@ -14,6 +14,6 @@ internal class TaskCompletedAction(
         context.getString(R.string.action_task_completed, task.title)
 
     override suspend fun undo() {
-        repository.setTaskCompleted(task.id, false)
+        repository.setCompleted(task.id, false)
     }
 }

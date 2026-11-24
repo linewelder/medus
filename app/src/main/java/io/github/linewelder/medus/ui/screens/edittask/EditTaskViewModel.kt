@@ -19,7 +19,7 @@ class EditTaskViewModel @Inject constructor(
     private val areaRepository: AreaRepository,
 ) : ViewModel() {
     private val taskId = Id.fromString<Task>(savedStateHandle.toRoute<EditTaskRoute>().taskId)
-    val areas = areaRepository.findAllAreas()
+    val areas = areaRepository.findAll()
 
     private val mutableTaskState = MutableStateFlow<TaskState>(TaskState.Loading)
     val taskState = mutableTaskState.asStateFlow()
@@ -30,7 +30,7 @@ class EditTaskViewModel @Inject constructor(
     init {
         viewModelScope.launch {
             mutableTaskState.value = try {
-                taskRepository.getTask(taskId)?.let(TaskState::Loaded) ?: TaskState.Unavailable
+                taskRepository.findById(taskId)?.let(TaskState::Loaded) ?: TaskState.Unavailable
             } catch (_: SQLiteException) {
                 TaskState.Unavailable
             }
@@ -50,7 +50,7 @@ class EditTaskViewModel @Inject constructor(
         if (taskTitle.isEmpty() || areaName == "") return
 
         applyChange(failure = ChangeState.SaveFailed) {
-            if (taskRepository.updateTask(taskId, taskTitle, areaId, completed, areaName, timeEstimateMins)) {
+            if (taskRepository.update(taskId, taskTitle, areaId, completed, areaName, timeEstimateMins)) {
                 ChangeState.Finished
             } else {
                 mutableTaskState.value = TaskState.Unavailable
@@ -61,7 +61,7 @@ class EditTaskViewModel @Inject constructor(
 
     fun deleteTask() {
         applyChange(failure = ChangeState.DeleteFailed) {
-            taskRepository.deleteTask(taskId)
+            taskRepository.delete(taskId)
             ChangeState.Finished
         }
     }

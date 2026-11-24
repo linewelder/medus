@@ -14,18 +14,18 @@ class MenuViewModel @Inject constructor(
     checklistRepository: ChecklistRepository,
 ) : ViewModel() {
     val checklists = checklistRepository.findAll()
-    val areas = areaRepository.findAllAreas()
-    val emptyAreaIds = areaRepository.findEmptyAreaIds()
+    val areas = areaRepository.findAll()
+    val emptyAreaIds = areaRepository.findEmptyIds()
 
     fun moveArea(id: Id<Area>, newIndex: Int) {
         viewModelScope.launch {
-            areaRepository.moveArea(id, newIndex)
+            areaRepository.reorder(id, newIndex)
         }
     }
 
     fun deleteEmptyArea(id: Id<Area>) {
         viewModelScope.launch {
-            areaRepository.deleteEmptyArea(id)
+            areaRepository.delete(id)
         }
     }
 }

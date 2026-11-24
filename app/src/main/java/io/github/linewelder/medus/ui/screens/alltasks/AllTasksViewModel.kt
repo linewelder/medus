@@ -15,12 +15,12 @@ class AllTasksViewModel @Inject constructor(
     private val areaRepository: AreaRepository,
     private val actionHistory: ActionHistory,
 ) : ViewModel() {
-    val tasks = taskRepository.findAllTasks()
-    val areas = areaRepository.findAllAreas()
+    val tasks = taskRepository.findAll()
+    val areas = areaRepository.findAll()
 
     fun setTaskCompleted(task: Task, completed: Boolean) {
         viewModelScope.launch {
-            taskRepository.setTaskCompleted(task.id, completed)
+            taskRepository.setCompleted(task.id, completed)
             if (completed) {
                 actionHistory.commit(TaskCompletedAction(taskRepository, task))
             }

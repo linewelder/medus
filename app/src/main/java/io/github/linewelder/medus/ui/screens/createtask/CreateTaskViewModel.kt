@@ -15,7 +15,7 @@ class CreateTaskViewModel @Inject constructor(
     private val taskRepository: TaskRepository,
     private val areaRepository: AreaRepository,
 ) : ViewModel() {
-    val areas = areaRepository.findAllAreas()
+    val areas = areaRepository.findAll()
 
     private val mutableSaveState = MutableStateFlow(SaveState.Editing)
     val saveState = mutableSaveState.asStateFlow()
@@ -32,7 +32,7 @@ class CreateTaskViewModel @Inject constructor(
         viewModelScope.launch {
             val area = selectedArea ?: Area(id = Id.random(), name = areaName)
             try {
-                taskRepository.createTask(
+                taskRepository.createWithArea(
                     taskTitle,
                     area,
                     isNewArea = selectedArea == null,

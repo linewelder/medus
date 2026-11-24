@@ -17,16 +17,16 @@ interface TaskDao {
                  dateCreated DESC,
                  id DESC
         """)
-    fun getAllTasks(): Flow<List<TaskEntity>>
+    fun getAll(): Flow<List<TaskEntity>>
 
     @Query("SELECT * FROM tasks WHERE id = :id")
-    suspend fun getTask(id: Id<Task>): TaskEntity?
+    suspend fun getById(id: Id<Task>): TaskEntity?
 
     @Query("UPDATE tasks SET dateCompleted = COALESCE(dateCompleted, :dateCompleted) WHERE id = :id")
-    suspend fun markTaskCompleted(id: Id<Task>, dateCompleted: Instant)
+    suspend fun markCompleted(id: Id<Task>, dateCompleted: Instant)
 
     @Query("UPDATE tasks SET dateCompleted = NULL WHERE id = :id")
-    suspend fun markTaskIncomplete(id: Id<Task>)
+    suspend fun markIncomplete(id: Id<Task>)
 
     @Query("""
         UPDATE tasks
@@ -34,7 +34,7 @@ interface TaskDao {
             timeEstimateMins = :timeEstimateMins
         WHERE id = :id
         """)
-    suspend fun updateTask(
+    suspend fun update(
         id: Id<Task>,
         title: String,
         areaId: Id<Area>?,
@@ -43,7 +43,7 @@ interface TaskDao {
     )
 
     @Query("DELETE FROM tasks WHERE id = :id")
-    suspend fun deleteTask(id: Id<Task>)
+    suspend fun delete(id: Id<Task>)
 
     @Insert
     suspend fun insert(task: TaskEntity)

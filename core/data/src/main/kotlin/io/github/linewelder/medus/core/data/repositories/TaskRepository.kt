@@ -12,13 +12,13 @@ import kotlin.time.*
 class TaskRepository @Inject constructor(
     private val database: MedusDatabase
 ) {
-    fun findAllTasks() =
-        database.taskDao().getAllTasks().map { it.map(TaskEntity::asExternalModel) }
+    fun findAll() =
+        database.taskDao().getAll().map { it.map(TaskEntity::asExternalModel) }
 
-    suspend fun getTask(id: Id<Task>) = database.taskDao().getTask(id)?.asExternalModel()
+    suspend fun findById(id: Id<Task>) = database.taskDao().getById(id)?.asExternalModel()
 
     /** Update the task and save its new area together. Return whether the task still exists. */
-    suspend fun updateTask(
+    suspend fun update(
         id: Id<Task>,
         title: String,
         areaId: Id<Area>?,
@@ -26,29 +26,29 @@ class TaskRepository @Inject constructor(
         newAreaName: String?,
         timeEstimateMins: Int?,
     ): Boolean = database.withTransaction {
-        val task = database.taskDao().getTask(id) ?: return@withTransaction false
+        val task = database.taskDao().getById(id) ?: return@withTransaction false
 
         val newArea = newAreaName?.let { Area(id = Id.random(), name = it) }
         if (newArea != null) {
             database.areaDao().insert(newArea)
         }
         val dateCompleted = if (completed) task.dateCompleted ?: Clock.System.now() else null
-        database.taskDao().updateTask(id, title, newArea?.id ?: areaId, dateCompleted, timeEstimateMins)
+        database.taskDao().update(id, title, newArea?.id ?: areaId, dateCompleted, timeEstimateMins)
         true
     }
 
-    suspend fun deleteTask(id: Id<Task>) = database.taskDao().deleteTask(id)
+    suspend fun delete(id: Id<Task>) = database.taskDao().delete(id)
 
-    suspend fun setTaskCompleted(id: Id<Task>, completed: Boolean) {
+    suspend fun setCompleted(id: Id<Task>, completed: Boolean) {
         if (completed) {
-            database.taskDao().markTaskCompleted(id, Clock.System.now())
+            database.taskDao().markCompleted(id, Clock.System.now())
         } else {
-            database.taskDao().markTaskIncomplete(id)
+            database.taskDao().markIncomplete(id)
         }
     }
 
     /** Save a task and insert its new area in the same transaction when one is provided. */
-    suspend fun createTask(
+    suspend fun createWithArea(
         title: String,
         area: Area,
         isNewArea: Boolean,
