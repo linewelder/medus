@@ -42,7 +42,8 @@ fun TaskListItem(task: Task, onEdit: () -> Unit, onCompletedChange: (Boolean) ->
             )
 
             if (!completed) {
-                task.timeEstimateMins?.let { TimeEstimateLabel(it) }
+                task.timeEstimateMins?.let { EstimateLabel(formatDurationMinutes(it)) }
+                task.priceEstimate?.let { EstimateLabel(formatPrice(it)) }
             }
         }
         val confetti = rememberConfettiAnchor()
@@ -61,13 +62,13 @@ fun TaskListItem(task: Task, onEdit: () -> Unit, onCompletedChange: (Boolean) ->
 }
 
 @Composable
-private fun TimeEstimateLabel(minutes: Int) {
+private fun EstimateLabel(value: String) {
     Surface(
         shape = MaterialTheme.shapes.extraSmall,
         border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline),
     ) {
         Text(
-            text = formatDurationMinutes(minutes),
+            text = value,
             modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp),
             style = MaterialTheme.typography.labelMedium,
             softWrap = false,
@@ -86,6 +87,7 @@ private fun TaskListItemPreview() {
                 id = Id.empty(),
                 title = "Do Homework",
                 timeEstimateMins = 60,
+                priceEstimate = 100,
                 dateCreated = Instant.fromEpochMilliseconds(0),
                 dateCompleted = if (completed) Instant.fromEpochMilliseconds(0) else null,
             ),

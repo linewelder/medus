@@ -25,6 +25,7 @@ class TaskRepository @Inject constructor(
         completed: Boolean,
         newAreaName: String?,
         timeEstimateMins: Int?,
+        priceEstimate: Int?,
     ): Boolean = database.withTransaction {
         val task = database.taskDao().getById(id) ?: return@withTransaction false
 
@@ -33,7 +34,7 @@ class TaskRepository @Inject constructor(
             database.areaDao().insert(newArea)
         }
         val dateCompleted = if (completed) task.dateCompleted ?: Clock.System.now() else null
-        database.taskDao().update(id, title, newArea?.id ?: areaId, dateCompleted, timeEstimateMins)
+        database.taskDao().update(id, title, newArea?.id ?: areaId, dateCompleted, timeEstimateMins, priceEstimate)
         true
     }
 
@@ -53,6 +54,7 @@ class TaskRepository @Inject constructor(
         area: Area,
         isNewArea: Boolean,
         timeEstimateMins: Int?,
+        priceEstimate: Int?,
     ) {
         val newArea = if (isNewArea) area.copy() else null
         database.withTransaction {
@@ -67,6 +69,7 @@ class TaskRepository @Inject constructor(
                     dateCompleted = null,
                     areaId = area.id,
                     timeEstimateMins = timeEstimateMins,
+                    priceEstimate = priceEstimate,
                 )
             )
         }

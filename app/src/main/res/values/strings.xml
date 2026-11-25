@@ -18,7 +18,8 @@
     <string name="create_task">Create task</string>
     <string name="task_title">Task title</string>
     <string name="task_time_estimate">Time estimate</string>
-    <string name="task_time_estimate_none">-</string>
+    <string name="task_price_estimate">Price estimate</string>
+    <string name="no_value">-</string>
     <string name="duration_minutes">%1$d min</string>
     <string name="duration_hours">%1$d h</string>
     <string name="duration_hours_minutes">%1$d h %2$d min</string>

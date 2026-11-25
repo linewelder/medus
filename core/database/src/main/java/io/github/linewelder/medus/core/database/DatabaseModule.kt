@@ -22,6 +22,7 @@ object DatabaseModule {
                 migration3To4,
                 migration4To5,
                 migration5To6,
+                migration6To7,
             )
             .fallbackToDestructiveMigrationFrom(true, 1)
             .build()

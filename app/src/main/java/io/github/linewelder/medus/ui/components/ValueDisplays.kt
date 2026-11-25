@@ -4,6 +4,8 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.res.*
 import io.github.linewelder.medus.R
 import io.github.linewelder.medus.core.model.*
+import java.text.*
+import java.util.*
 
 @Composable
 fun formatDurationMinutes(totalMinutes: Int): String {
@@ -23,3 +25,9 @@ fun ChecklistRole.displayName(): String = stringResource(
         ChecklistRole.Evening -> R.string.checklist_evening
     },
 )
+
+fun formatPrice(amount: Int): String =
+    NumberFormat.getCurrencyInstance(Locale.forLanguageTag("pl-PL")).apply {
+        minimumFractionDigits = 0
+        maximumFractionDigits = 0
+    }.format(amount)

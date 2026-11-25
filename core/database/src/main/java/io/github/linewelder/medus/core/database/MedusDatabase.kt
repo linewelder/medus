@@ -12,7 +12,7 @@ import io.github.linewelder.medus.core.database.model.*
         ChecklistEntity::class,
         ChecklistItemEntity::class,
     ],
-    version = 6,
+    version = 7,
 )
 @TypeConverters(
     InstantConverter::class,

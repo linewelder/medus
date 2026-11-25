@@ -21,7 +21,13 @@ class CreateTaskViewModel @Inject constructor(
     val saveState = mutableSaveState.asStateFlow()
 
     /** Save the task with the selected area or create an area from the entered name. */
-    fun saveTask(title: String, selectedArea: Area?, newAreaName: String, timeEstimateMins: Int?) {
+    fun saveTask(
+        title: String,
+        selectedArea: Area?,
+        newAreaName: String,
+        timeEstimateMins: Int?,
+        priceEstimate: Int?,
+    ) {
         val canSave = saveState.value == SaveState.Editing || saveState.value == SaveState.Failed
         val taskTitle = title.trim()
         val areaName = newAreaName.trim()
@@ -37,6 +43,7 @@ class CreateTaskViewModel @Inject constructor(
                     area,
                     isNewArea = selectedArea == null,
                     timeEstimateMins = timeEstimateMins,
+                    priceEstimate = priceEstimate,
                 )
                 mutableSaveState.value = SaveState.Saved
             } catch (_: SQLiteException) {

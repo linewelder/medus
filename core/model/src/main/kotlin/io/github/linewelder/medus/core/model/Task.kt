@@ -9,4 +9,5 @@ data class Task(
     val dateCompleted: Instant?,
     val areaId: Id<Area>? = null,
     val timeEstimateMins: Int? = null,
+    val priceEstimate: Int? = null,
 )

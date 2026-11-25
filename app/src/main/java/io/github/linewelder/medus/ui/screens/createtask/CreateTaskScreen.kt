@@ -48,13 +48,14 @@ private fun CreateTaskScreenContent(
     saveState: SaveState,
     onClose: () -> Unit,
     initialAreaId: String?,
-    onSaveTask: (String, Area?, String, Int?) -> Unit,
+    onSaveTask: (String, Area?, String, Int?, Int?) -> Unit,
 ) {
     var title by rememberSaveable { mutableStateOf("") }
     var selectedAreaId by rememberSaveable { mutableStateOf(initialAreaId) }
     var creatingArea by rememberSaveable { mutableStateOf(false) }
     var areaName by rememberSaveable { mutableStateOf("") }
     var timeEstimateMins by rememberSaveable { mutableStateOf<Int?>(null) }
+    var priceEstimate by rememberSaveable { mutableStateOf<Int?>(null) }
     val selectedArea = areas.firstOrNull { it.id.toString() == selectedAreaId }
     val editing = saveState == SaveState.Editing || saveState == SaveState.Failed
     val hasArea = if (creatingArea) areaName.isNotBlank() else selectedArea != null
@@ -100,6 +101,11 @@ private fun CreateTaskScreenContent(
                 enabled = editing,
                 onTimeEstimateChange = { timeEstimateMins = it },
             )
+            TaskPriceEstimatePicker(
+                priceEstimate = priceEstimate,
+                enabled = editing,
+                onPriceEstimateChange = { priceEstimate = it },
+            )
             if (saveState == SaveState.Failed) {
                 Text(stringResource(R.string.save_task_error), color = MaterialTheme.colorScheme.error)
             }
@@ -112,7 +118,9 @@ private fun CreateTaskScreenContent(
                 }
                 Button(
                     onClick = {
-                        onSaveTask(title, selectedArea.takeUnless { creatingArea }, areaName, timeEstimateMins)
+                        onSaveTask(
+                            title, selectedArea.takeUnless { creatingArea }, areaName, timeEstimateMins, priceEstimate,
+                        )
                     },
                     enabled = editing && title.isNotBlank() && hasArea,
                 ) {
@@ -132,7 +140,7 @@ private fun CreateTaskScreenPreview() {
             saveState = SaveState.Editing,
             onClose = {},
             initialAreaId = null,
-            onSaveTask = { _, _, _, _ -> },
+            onSaveTask = { _, _, _, _, _ -> },
         )
     }
 }

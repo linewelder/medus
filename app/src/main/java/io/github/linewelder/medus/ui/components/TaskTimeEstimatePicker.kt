@@ -17,14 +17,14 @@ fun TaskTimeEstimatePicker(
     onTimeEstimateChange: (Int?) -> Unit,
 ) {
     val label = stringResource(R.string.task_time_estimate)
-    val noEstimate = stringResource(R.string.task_time_estimate_none)
+    val noValue = stringResource(R.string.no_value)
 
     WheelPickerField(
         value = timeEstimateMins,
         onValueChange = onTimeEstimateChange,
         options = timeEstimateOptions,
         label = { Text(label) },
-        itemDisplay = { it?.let { formatDurationMinutes(it) } ?: noEstimate },
+        itemDisplay = { it?.let { formatDurationMinutes(it) } ?: noValue },
         sortComparator = nullsFirst(naturalOrder()),
         enabled = enabled,
     )

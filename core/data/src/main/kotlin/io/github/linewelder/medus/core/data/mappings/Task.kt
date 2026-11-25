@@ -11,4 +11,5 @@ fun TaskEntity.asExternalModel() =
         dateCompleted = dateCompleted,
         areaId = areaId,
         timeEstimateMins = timeEstimateMins,
+        priceEstimate = priceEstimate,
     )

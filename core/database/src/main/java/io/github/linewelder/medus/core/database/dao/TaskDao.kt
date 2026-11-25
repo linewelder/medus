@@ -31,7 +31,7 @@ interface TaskDao {
     @Query("""
         UPDATE tasks
         SET title = :title, areaId = :areaId, dateCompleted = :dateCompleted,
-            timeEstimateMins = :timeEstimateMins
+            timeEstimateMins = :timeEstimateMins, priceEstimate = :priceEstimate
         WHERE id = :id
         """)
     suspend fun update(
@@ -40,6 +40,7 @@ interface TaskDao {
         areaId: Id<Area>?,
         dateCompleted: Instant?,
         timeEstimateMins: Int?,
+        priceEstimate: Int?,
     )
 
     @Query("DELETE FROM tasks WHERE id = :id")

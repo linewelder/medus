@@ -44,13 +44,17 @@ class EditTaskViewModel @Inject constructor(
         completed: Boolean,
         newAreaName: String?,
         timeEstimateMins: Int?,
+        priceEstimate: Int?,
     ) {
         val taskTitle = title.trim()
         val areaName = newAreaName?.trim()
         if (taskTitle.isEmpty() || areaName == "") return
 
         applyChange(failure = ChangeState.SaveFailed) {
-            if (taskRepository.update(taskId, taskTitle, areaId, completed, areaName, timeEstimateMins)) {
+            val updated = taskRepository.update(
+                taskId, taskTitle, areaId, completed, areaName, timeEstimateMins, priceEstimate,
+            )
+            if (updated) {
                 ChangeState.Finished
             } else {
                 mutableTaskState.value = TaskState.Unavailable
