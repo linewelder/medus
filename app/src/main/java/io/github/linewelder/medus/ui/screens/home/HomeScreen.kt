@@ -52,6 +52,7 @@ fun HomeScreen(
 
 /**
  * @param activeChecklistContent Is only composed if [activeChecklist] is not null
+ * @param previewTime Hardcoded clock value for previews
  */
 @Composable
 private fun HomeScreenContent(
@@ -61,6 +62,7 @@ private fun HomeScreenContent(
     startOfToday: Instant,
     activeChecklistContent: (@Composable (Modifier) -> Unit),
     calendarContent: @Composable (date: LocalDate, modifier: Modifier) -> Unit,
+    previewTime: String? = null,
 ) {
     Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
         Column(
@@ -71,7 +73,7 @@ private fun HomeScreenContent(
                 .consumeWindowInsets(innerPadding),
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
-            CurrentTimeLabel(Modifier.fillMaxWidth())
+            CurrentTimeLabel(Modifier.fillMaxWidth(), previewTime = previewTime)
 
             if (activeChecklist != null) {
                 fun <T> animationSpec() = tween<T>(
@@ -172,6 +174,7 @@ private fun HomeScreenPreview() {
                 activeChecklist = checklist,
                 startOfToday = completionReset,
                 today = today,
+                previewTime = "9:41 AM",
                 activeChecklistContent = { modifier ->
                     ActiveChecklistContent(
                         checklist = checklist,
