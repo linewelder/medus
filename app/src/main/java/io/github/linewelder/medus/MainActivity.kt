@@ -6,6 +6,7 @@ import androidx.activity.compose.*
 import dagger.hilt.android.*
 import io.github.linewelder.medus.ui.*
 import io.github.linewelder.medus.ui.components.*
+import io.github.linewelder.medus.ui.navigation.*
 import io.github.linewelder.medus.ui.theme.*
 import javax.inject.*
 

@@ -6,7 +6,7 @@ import androidx.navigation.*
 import dagger.hilt.android.lifecycle.*
 import io.github.linewelder.medus.core.data.repositories.*
 import io.github.linewelder.medus.core.model.*
-import io.github.linewelder.medus.ui.*
+import io.github.linewelder.medus.ui.navigation.*
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import javax.inject.*
