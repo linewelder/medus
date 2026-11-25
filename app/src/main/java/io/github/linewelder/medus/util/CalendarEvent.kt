@@ -18,7 +18,7 @@ fun readCalendarEvents(resolver: ContentResolver, date: LocalDate): List<Calenda
 
     fun dayBoundaries(timeZone: TimeZone) = listOf(
         date.atStartOfDayIn(timeZone).toEpochMilliseconds(),
-        nextDate.atStartOfDayIn(timeZone).toEpochMilliseconds(),
+        nextDate.atStartOfDayIn(timeZone).toEpochMilliseconds() - 1,
     )
 
     val localBoundaries = dayBoundaries(TimeZone.currentSystemDefault())
