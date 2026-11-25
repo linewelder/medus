@@ -10,7 +10,8 @@ import javax.inject.*
 import kotlin.time.*
 
 class TaskRepository @Inject constructor(
-    private val database: MedusDatabase
+    private val database: MedusDatabase,
+    private val areaRepository: AreaRepository,
 ) {
     fun findAll() =
         database.taskDao().getAll().map { it.map(TaskEntity::asExternalModel) }
@@ -18,23 +19,23 @@ class TaskRepository @Inject constructor(
     suspend fun findById(id: Id<Task>) = database.taskDao().getById(id)?.asExternalModel()
 
     /** Update the task and save its new area together. Return whether the task still exists. */
-    suspend fun update(
-        id: Id<Task>,
-        title: String,
-        areaId: Id<Area>?,
+    suspend fun updateWithArea(
+        task: Task,
         completed: Boolean,
-        newAreaName: String?,
-        timeEstimateMins: Int?,
-        priceEstimate: Int?,
+        newArea: Area?,
     ): Boolean = database.withTransaction {
-        val task = database.taskDao().getById(id) ?: return@withTransaction false
+        val dao = database.taskDao()
+        val existing = dao.getById(task.id) ?: return@withTransaction false
+        if (newArea != null) areaRepository.insert(newArea)
 
-        val newArea = newAreaName?.let { Area(id = Id.random(), name = it) }
-        if (newArea != null) {
-            database.areaDao().insert(newArea)
-        }
-        val dateCompleted = if (completed) task.dateCompleted ?: Clock.System.now() else null
-        database.taskDao().update(id, title, newArea?.id ?: areaId, dateCompleted, timeEstimateMins, priceEstimate)
+        val dateCompleted = if (completed) existing.dateCompleted ?: Clock.System.now() else null
+        dao.update(
+            task.asEntity().copy(
+                dateCreated = existing.dateCreated,
+                dateCompleted = dateCompleted,
+                areaId = newArea?.id ?: task.areaId,
+            )
+        )
         true
     }
 
@@ -49,32 +50,14 @@ class TaskRepository @Inject constructor(
     }
 
     /** Save a task and insert its new area in the same transaction when one is provided. */
-    suspend fun createWithArea(
-        title: String,
-        area: Area,
-        isNewArea: Boolean,
-        timeEstimateMins: Int?,
-        priceEstimate: Int?,
-    ) {
-        val newArea = if (isNewArea) area.copy() else null
-        database.withTransaction {
-            if (newArea != null) {
-                database.areaDao().insert(newArea)
-            }
-            database.taskDao().insert(
-                TaskEntity(
-                    id = Id.random(),
-                    title = title,
-                    dateCreated = Clock.System.now(),
-                    dateCompleted = null,
-                    areaId = area.id,
-                    timeEstimateMins = timeEstimateMins,
-                    priceEstimate = priceEstimate,
-                )
-            )
+    suspend fun createWithArea(task: Task, newArea: Area?) {
+        val sortOrder = database.withTransaction {
+            val newAreaSortOrder = newArea?.let { areaRepository.insert(it) }
+            database.taskDao().insert(task.asEntity().copy(areaId = newArea?.id ?: task.areaId))
+            newAreaSortOrder
         }
-        if (newArea != null) {
-            area.sortOrder = newArea.sortOrder
+        if (newArea != null && sortOrder != null) {
+            newArea.sortOrder = sortOrder
         }
     }
 }

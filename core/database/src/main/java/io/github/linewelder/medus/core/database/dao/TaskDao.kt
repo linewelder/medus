@@ -28,20 +28,8 @@ interface TaskDao {
     @Query("UPDATE tasks SET dateCompleted = NULL WHERE id = :id")
     suspend fun markIncomplete(id: Id<Task>)
 
-    @Query("""
-        UPDATE tasks
-        SET title = :title, areaId = :areaId, dateCompleted = :dateCompleted,
-            timeEstimateMins = :timeEstimateMins, priceEstimate = :priceEstimate
-        WHERE id = :id
-        """)
-    suspend fun update(
-        id: Id<Task>,
-        title: String,
-        areaId: Id<Area>?,
-        dateCompleted: Instant?,
-        timeEstimateMins: Int?,
-        priceEstimate: Int?,
-    )
+    @Update
+    suspend fun update(task: TaskEntity)
 
     @Query("DELETE FROM tasks WHERE id = :id")
     suspend fun delete(id: Id<Task>)

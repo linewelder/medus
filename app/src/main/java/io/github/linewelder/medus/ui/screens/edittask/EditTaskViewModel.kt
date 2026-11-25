@@ -50,9 +50,17 @@ class EditTaskViewModel @Inject constructor(
         val areaName = newAreaName?.trim()
         if (taskTitle.isEmpty() || areaName == "") return
 
+        val loadedTask = (taskState.value as? TaskState.Loaded)?.task ?: return
         applyChange(failure = ChangeState.SaveFailed) {
             val updated = taskRepository.update(
-                taskId, taskTitle, areaId, completed, areaName, timeEstimateMins, priceEstimate,
+                task = loadedTask.copy(
+                    title = taskTitle,
+                    areaId = areaId,
+                    timeEstimateMins = timeEstimateMins,
+                    priceEstimate = priceEstimate,
+                ),
+                completed = completed,
+                newArea = areaName?.let { Area(id = Id.random(), name = it) },
             )
             if (updated) {
                 ChangeState.Finished

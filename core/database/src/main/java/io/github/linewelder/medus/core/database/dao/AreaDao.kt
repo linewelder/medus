@@ -25,13 +25,16 @@ abstract class AreaDao {
     @Query("SELECT * FROM areas WHERE NOT EXISTS (SELECT 1 FROM tasks WHERE tasks.areaId = areas.id)")
     abstract fun getEmpty(): Flow<List<AreaEntity>>
 
-    /** Insert an area at the end of the current order and assign it the saved position. */
+    /** Insert the area and return its assigned sort order. */
     @Transaction
-    open suspend fun insert(area: Area) {
+    open suspend fun insert(area: AreaEntity): Long {
         val sortOrder = nextSortOrder()
-        insertEntity(AreaEntity(area.id, area.name, sortOrder))
-        area.sortOrder = sortOrder
+        insertEntity(area.copy(sortOrder = sortOrder))
+        return sortOrder
     }
+
+    @Update
+    abstract suspend fun update(areas: List<AreaEntity>)
 
     @Query("DELETE FROM areas WHERE id = :id")
     abstract suspend fun delete(id: Id<Area>)

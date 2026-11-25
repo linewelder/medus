@@ -22,6 +22,8 @@ class AreaRepository @Inject constructor(
     fun findEmptyIds(): Flow<Set<Id<Area>>> =
         database.areaDao().getEmpty().map { areas -> areas.map { it.id }.toSet() }
 
+    suspend fun insert(area: Area): Long = database.areaDao().insert(area.asEntity())
+
     suspend fun reorder(id: Id<Area>, newSortOrder: Int) = database.areaDao().reorder(id, newSortOrder)
 
     suspend fun delete(id: Id<Area>) = database.areaDao().delete(id)

@@ -8,6 +8,7 @@ import io.github.linewelder.medus.core.model.*
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import javax.inject.*
+import kotlin.time.*
 
 /** Load the available areas and track the task save for the lifetime of the screen. */
 @HiltViewModel
@@ -39,11 +40,16 @@ class CreateTaskViewModel @Inject constructor(
             val area = selectedArea ?: Area(id = Id.random(), name = areaName)
             try {
                 taskRepository.createWithArea(
-                    taskTitle,
-                    area,
-                    isNewArea = selectedArea == null,
-                    timeEstimateMins = timeEstimateMins,
-                    priceEstimate = priceEstimate,
+                    task = Task(
+                        id = Id.random(),
+                        title = taskTitle,
+                        dateCreated = Clock.System.now(),
+                        dateCompleted = null,
+                        areaId = area.id,
+                        timeEstimateMins = timeEstimateMins,
+                        priceEstimate = priceEstimate,
+                    ),
+                    newArea = area.takeIf { selectedArea == null },
                 )
                 mutableSaveState.value = SaveState.Saved
             } catch (_: SQLiteException) {

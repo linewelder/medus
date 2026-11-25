@@ -5,7 +5,7 @@ import io.github.linewelder.medus.core.model.*
 
 fun TaskEntity.asExternalModel() =
     Task(
-        id = id.unsafeCast(),
+        id = id,
         title = title,
         dateCreated = dateCreated,
         dateCompleted = dateCompleted,
@@ -13,3 +13,13 @@ fun TaskEntity.asExternalModel() =
         timeEstimateMins = timeEstimateMins,
         priceEstimate = priceEstimate,
     )
+
+fun Task.asEntity() = TaskEntity(
+    id = id,
+    title = title,
+    dateCreated = dateCreated,
+    dateCompleted = dateCompleted,
+    areaId = areaId,
+    timeEstimateMins = timeEstimateMins,
+    priceEstimate = priceEstimate,
+)
