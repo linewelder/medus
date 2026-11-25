@@ -1,15 +1,16 @@
 package io.github.linewelder.medus.ui.screens.edittask
 
-import android.database.sqlite.SQLiteException
+import android.database.sqlite.*
 import androidx.lifecycle.*
 import androidx.navigation.*
 import dagger.hilt.android.lifecycle.*
 import io.github.linewelder.medus.core.data.repositories.*
 import io.github.linewelder.medus.core.model.*
-import io.github.linewelder.medus.ui.EditTaskRoute
+import io.github.linewelder.medus.ui.*
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import javax.inject.*
+import kotlin.time.*
 
 /** Load the task identified by the route and persist edits or deletion. */
 @HiltViewModel
@@ -52,22 +53,18 @@ class EditTaskViewModel @Inject constructor(
 
         val loadedTask = (taskState.value as? TaskState.Loaded)?.task ?: return
         applyChange(failure = ChangeState.SaveFailed) {
-            val updated = taskRepository.update(
-                task = loadedTask.copy(
-                    title = taskTitle,
-                    areaId = areaId,
-                    timeEstimateMins = timeEstimateMins,
-                    priceEstimate = priceEstimate,
-                ),
-                completed = completed,
+            taskRepository.updateWithArea(
+                task = loadedTask
+                    .withCompletion(completed, Clock.System.now())
+                    .copy(
+                        title = taskTitle,
+                        areaId = areaId,
+                        timeEstimateMins = timeEstimateMins,
+                        priceEstimate = priceEstimate,
+                    ),
                 newArea = areaName?.let { Area(id = Id.random(), name = it) },
             )
-            if (updated) {
-                ChangeState.Finished
-            } else {
-                mutableTaskState.value = TaskState.Unavailable
-                ChangeState.Editing
-            }
+            ChangeState.Finished
         }
     }
 

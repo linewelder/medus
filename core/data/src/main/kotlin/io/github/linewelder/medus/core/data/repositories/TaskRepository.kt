@@ -21,22 +21,15 @@ class TaskRepository @Inject constructor(
     /** Update the task and save its new area together. Return whether the task still exists. */
     suspend fun updateWithArea(
         task: Task,
-        completed: Boolean,
         newArea: Area?,
-    ): Boolean = database.withTransaction {
+    ) = database.withTransaction {
         val dao = database.taskDao()
-        val existing = dao.getById(task.id) ?: return@withTransaction false
         if (newArea != null) areaRepository.insert(newArea)
 
-        val dateCompleted = if (completed) existing.dateCompleted ?: Clock.System.now() else null
-        dao.update(
-            task.asEntity().copy(
-                dateCreated = existing.dateCreated,
-                dateCompleted = dateCompleted,
-                areaId = newArea?.id ?: task.areaId,
-            )
+        val updatedTask = task.copy(
+            areaId = newArea?.id ?: task.areaId,
         )
-        true
+        dao.update(updatedTask.asEntity())
     }
 
     suspend fun delete(id: Id<Task>) = database.taskDao().delete(id)

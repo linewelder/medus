@@ -72,7 +72,7 @@ private fun EditTaskScreenContent(
                     var areaName by rememberSaveable { mutableStateOf("") }
                     var timeEstimateMins by rememberSaveable { mutableStateOf(task.timeEstimateMins) }
                     var priceEstimate by rememberSaveable { mutableStateOf(task.priceEstimate) }
-                    var completed by rememberSaveable { mutableStateOf(task.dateCompleted != null) }
+                    var completed by rememberSaveable { mutableStateOf(task.completed) }
                     var confirmingDeletion by rememberSaveable { mutableStateOf(false) }
                     val selectedArea = areas.firstOrNull { it.id.toString() == selectedAreaId }
 

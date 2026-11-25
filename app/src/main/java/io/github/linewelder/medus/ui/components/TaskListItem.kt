@@ -18,7 +18,6 @@ import kotlin.time.*
 /** Display a task with a completion checkbox and strike through completed titles. */
 @Composable
 fun TaskListItem(task: Task, onEdit: () -> Unit, onCompletedChange: (Boolean) -> Unit) {
-    val completed = task.dateCompleted != null
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -37,11 +36,11 @@ fun TaskListItem(task: Task, onEdit: () -> Unit, onCompletedChange: (Boolean) ->
                 text = task.title,
                 modifier = Modifier.weight(1f, fill = false),
                 style = MaterialTheme.typography.bodyLarge,
-                textDecoration = if (completed) TextDecoration.LineThrough else null,
-                color = if (completed) MaterialTheme.colorScheme.secondary else Color.Unspecified,
+                textDecoration = if (task.completed) TextDecoration.LineThrough else null,
+                color = if (task.completed) MaterialTheme.colorScheme.secondary else Color.Unspecified,
             )
 
-            if (!completed) {
+            if (!task.completed) {
                 task.timeEstimateMins?.let { EstimateLabel(formatDurationMinutes(it)) }
                 task.priceEstimate?.let { EstimateLabel(formatPrice(it)) }
             }
@@ -49,7 +48,7 @@ fun TaskListItem(task: Task, onEdit: () -> Unit, onCompletedChange: (Boolean) ->
         val confetti = rememberConfettiAnchor()
         val completionLabel = stringResource(R.string.task_completion_for_title, task.title)
         Checkbox(
-            checked = completed,
+            checked = task.completed,
             modifier = confetti.modifier
                 .sizeIn(minWidth = 56.dp, minHeight = 48.dp)
                 .semantics { contentDescription = completionLabel },
