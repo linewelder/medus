@@ -175,6 +175,15 @@ private fun AllTasksScreenPreview() {
             dateCreated = Instant.fromEpochMilliseconds(0),
             dateCompleted = null,
             areaId = errands.area.id,
+            priceEstimate = 100,
+        ),
+        Task(
+            id = Id.dummy(5),
+            title = "Sew up the whole on the shirt",
+            dateCreated = Instant.fromEpochMilliseconds(0),
+            dateCompleted = null,
+            areaId = errands.area.id,
+            timeEstimateMins = 20,
         ),
         Task(
             id = Id.dummy(4),
