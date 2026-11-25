@@ -22,6 +22,9 @@ class EditTaskViewModel @Inject constructor(
     private val taskId = Id.fromString<Task>(savedStateHandle.toRoute<EditTaskRoute>().taskId)
     val areas = areaRepository.findAll()
 
+    private val mutableSelectedAreaId = savedStateHandle.getMutableStateFlow<String?>("selectedAreaId", null)
+    val selectedAreaId = mutableSelectedAreaId.asStateFlow()
+
     private val mutableTaskState = MutableStateFlow<TaskState>(TaskState.Loading)
     val taskState = mutableTaskState.asStateFlow()
 
@@ -38,23 +41,37 @@ class EditTaskViewModel @Inject constructor(
         }
     }
 
-    /** Save the edited fields and create an area if a new name was entered. */
+    fun selectArea(area: Area) {
+        mutableSelectedAreaId.value = area.id.toString()
+    }
+
+    /** Insert a new area and select it after the insert succeeds. */
+    fun createArea(name: String) {
+        val areaName = name.trim()
+        if (areaName.isEmpty()) return
+
+        applyChange(failure = ChangeState.AreaCreationFailed) {
+            val area = Area(id = Id.random(), name = areaName)
+            areaRepository.insert(area)
+            selectArea(area)
+            ChangeState.Editing
+        }
+    }
+
     fun saveTask(
         title: String,
         areaId: Id<Area>?,
         completed: Boolean,
-        newAreaName: String?,
         timeEstimateMins: Int?,
         priceEstimate: Int?,
     ) {
         val taskTitle = title.trim()
-        val areaName = newAreaName?.trim()
-        if (taskTitle.isEmpty() || areaName == "") return
+        if (taskTitle.isEmpty()) return
 
         val loadedTask = (taskState.value as? TaskState.Loaded)?.task ?: return
         applyChange(failure = ChangeState.SaveFailed) {
-            taskRepository.updateWithArea(
-                task = loadedTask
+            taskRepository.update(
+                loadedTask
                     .withCompletion(completed, Clock.System.now())
                     .copy(
                         title = taskTitle,
@@ -62,7 +79,6 @@ class EditTaskViewModel @Inject constructor(
                         timeEstimateMins = timeEstimateMins,
                         priceEstimate = priceEstimate,
                     ),
-                newArea = areaName?.let { Area(id = Id.random(), name = it) },
             )
             ChangeState.Finished
         }
@@ -97,7 +113,7 @@ class EditTaskViewModel @Inject constructor(
     }
 
     enum class ChangeState {
-        Editing, Working, Finished, SaveFailed, DeleteFailed;
+        Editing, Working, Finished, SaveFailed, DeleteFailed, AreaCreationFailed;
 
         val blocksEditing get() = this == Working || this == Finished
     }

@@ -13,7 +13,6 @@
     <string name="menu">Menu</string>
     <string name="areas">Areas</string>
     <string name="reorder_area">Reorder %1$s</string>
-    <string name="area_filter">Area</string>
     <string name="all_areas">All</string>
     <string name="create_task">Create task</string>
     <string name="task_title">Task title</string>
@@ -23,9 +22,10 @@
     <string name="duration_minutes">%1$d min</string>
     <string name="duration_hours">%1$d h</string>
     <string name="duration_hours_minutes">%1$d h %2$d min</string>
-    <string name="choose_area">Choose an area</string>
     <string name="new_area">Create a new area</string>
     <string name="area_name">Area name</string>
+    <string name="create_area">Create area</string>
+    <string name="create_area_error">Couldn’t create the area. Try again.</string>
     <string name="cancel">Cancel</string>
     <string name="save_task">Save task</string>
     <string name="save_task_error">Couldn’t save the task. Try again.</string>

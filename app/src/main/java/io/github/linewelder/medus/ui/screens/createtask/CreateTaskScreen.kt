@@ -19,7 +19,7 @@ import io.github.linewelder.medus.ui.components.*
 import io.github.linewelder.medus.ui.screens.createtask.CreateTaskViewModel.*
 import io.github.linewelder.medus.ui.theme.*
 
-/** Display a task form with a choice of an existing area or an inline area name. */
+/** New task form with an area picker. */
 @Composable
 fun CreateTaskScreen(
     onClose: () -> Unit,
@@ -27,8 +27,9 @@ fun CreateTaskScreen(
     viewModel: CreateTaskViewModel = hiltViewModel(),
 ) {
     val areas by viewModel.areas.collectAsStateWithLifecycle(initialValue = emptyList())
+    val selectedAreaId by viewModel.selectedAreaId.collectAsStateWithLifecycle()
     val saveState by viewModel.saveState.collectAsStateWithLifecycle()
-    BackHandler(enabled = saveState == SaveState.Saving || saveState == SaveState.Saved) {}
+    BackHandler(enabled = saveState.blocksEditing) {}
     LaunchedEffect(saveState) {
         if (saveState == SaveState.Saved) onClose()
     }
@@ -37,7 +38,9 @@ fun CreateTaskScreen(
         areas,
         saveState,
         onClose,
-        initialAreaId = initialAreaId,
+        selectedAreaId = selectedAreaId ?: initialAreaId,
+        onSelectArea = viewModel::selectArea,
+        onCreateArea = viewModel::createArea,
         onSaveTask = viewModel::saveTask,
     )
 }
@@ -47,18 +50,16 @@ private fun CreateTaskScreenContent(
     areas: List<Area>,
     saveState: SaveState,
     onClose: () -> Unit,
-    initialAreaId: String?,
-    onSaveTask: (String, Area?, String, Int?, Int?) -> Unit,
+    selectedAreaId: String?,
+    onSelectArea: (Area) -> Unit,
+    onCreateArea: (String) -> Unit,
+    onSaveTask: (String, Id<Area>, Int?, Int?) -> Unit,
 ) {
     var title by rememberSaveable { mutableStateOf("") }
-    var selectedAreaId by rememberSaveable { mutableStateOf(initialAreaId) }
-    var creatingArea by rememberSaveable { mutableStateOf(false) }
-    var areaName by rememberSaveable { mutableStateOf("") }
     var timeEstimateMins by rememberSaveable { mutableStateOf<Int?>(null) }
     var priceEstimate by rememberSaveable { mutableStateOf<Int?>(null) }
-    val selectedArea = areas.firstOrNull { it.id.toString() == selectedAreaId }
-    val editing = saveState == SaveState.Editing || saveState == SaveState.Failed
-    val hasArea = if (creatingArea) areaName.isNotBlank() else selectedArea != null
+    val areaId = areas.firstOrNull { it.id.toString() == selectedAreaId }?.id
+    val editing = !saveState.blocksEditing
     val titleFocusRequester = remember { FocusRequester() }
 
     Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
@@ -85,16 +86,10 @@ private fun CreateTaskScreenContent(
             }
             TaskAreaPicker(
                 areas = areas,
-                selectedArea = selectedArea,
-                creatingArea = creatingArea,
-                areaName = areaName,
+                selectedAreaId = areaId,
                 enabled = editing,
-                onSelectArea = {
-                    selectedAreaId = it.id.toString()
-                    creatingArea = false
-                },
-                onCreateArea = { creatingArea = true },
-                onAreaNameChange = { areaName = it },
+                onSelectArea = onSelectArea,
+                onCreateArea = onCreateArea,
             )
             TaskTimeEstimatePicker(
                 timeEstimateMins = timeEstimateMins,
@@ -106,8 +101,13 @@ private fun CreateTaskScreenContent(
                 enabled = editing,
                 onPriceEstimateChange = { priceEstimate = it },
             )
-            if (saveState == SaveState.Failed) {
-                Text(stringResource(R.string.save_task_error), color = MaterialTheme.colorScheme.error)
+            val errorMessage = when (saveState) {
+                SaveState.Failed -> R.string.save_task_error
+                SaveState.AreaCreationFailed -> R.string.create_area_error
+                else -> null
+            }
+            if (errorMessage != null) {
+                Text(stringResource(errorMessage), color = MaterialTheme.colorScheme.error)
             }
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -118,11 +118,9 @@ private fun CreateTaskScreenContent(
                 }
                 Button(
                     onClick = {
-                        onSaveTask(
-                            title, selectedArea.takeUnless { creatingArea }, areaName, timeEstimateMins, priceEstimate,
-                        )
+                        if (areaId != null) onSaveTask(title, areaId, timeEstimateMins, priceEstimate)
                     },
-                    enabled = editing && title.isNotBlank() && hasArea,
+                    enabled = editing && title.isNotBlank() && areaId != null,
                 ) {
                     Text(stringResource(R.string.save_task))
                 }
@@ -139,8 +137,10 @@ private fun CreateTaskScreenPreview() {
             areas = listOf(Area(Id.empty(), "Errands")),
             saveState = SaveState.Editing,
             onClose = {},
-            initialAreaId = null,
-            onSaveTask = { _, _, _, _, _ -> },
+            selectedAreaId = null,
+            onSelectArea = {},
+            onCreateArea = {},
+            onSaveTask = { _, _, _, _ -> },
         )
     }
 }

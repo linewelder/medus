@@ -27,12 +27,23 @@ fun EditTaskScreen(onClose: () -> Unit, viewModel: EditTaskViewModel = hiltViewM
     val taskState by viewModel.taskState.collectAsStateWithLifecycle()
     val changeState by viewModel.changeState.collectAsStateWithLifecycle()
     val areas by viewModel.areas.collectAsStateWithLifecycle(initialValue = emptyList())
+    val selectedAreaId by viewModel.selectedAreaId.collectAsStateWithLifecycle()
     BackHandler(enabled = changeState.blocksEditing) {}
     LaunchedEffect(changeState) {
         if (changeState == ChangeState.Finished) onClose()
     }
 
-    EditTaskScreenContent(taskState, changeState, areas, onClose, viewModel::saveTask, viewModel::deleteTask)
+    EditTaskScreenContent(
+        taskState = taskState,
+        changeState = changeState,
+        areas = areas,
+        selectedAreaId = selectedAreaId,
+        onClose = onClose,
+        onSelectArea = viewModel::selectArea,
+        onCreateArea = viewModel::createArea,
+        onSaveTask = viewModel::saveTask,
+        onDeleteTask = viewModel::deleteTask,
+    )
 }
 
 /** Render the edit form and deletion confirmation from the current task state. */
@@ -41,8 +52,11 @@ private fun EditTaskScreenContent(
     taskState: TaskState,
     changeState: ChangeState,
     areas: List<Area>,
+    selectedAreaId: String?,
     onClose: () -> Unit,
-    onSaveTask: (String, Id<Area>?, Boolean, String?, Int?, Int?) -> Unit,
+    onSelectArea: (Area) -> Unit,
+    onCreateArea: (String) -> Unit,
+    onSaveTask: (String, Id<Area>?, Boolean, Int?, Int?) -> Unit,
     onDeleteTask: () -> Unit,
 ) {
     val editing = !changeState.blocksEditing
@@ -67,14 +81,11 @@ private fun EditTaskScreenContent(
                 is TaskState.Loaded -> {
                     val task = state.task
                     var title by rememberSaveable { mutableStateOf(task.title) }
-                    var selectedAreaId by rememberSaveable { mutableStateOf(task.areaId?.toString()) }
-                    var creatingArea by rememberSaveable { mutableStateOf(false) }
-                    var areaName by rememberSaveable { mutableStateOf("") }
                     var timeEstimateMins by rememberSaveable { mutableStateOf(task.timeEstimateMins) }
                     var priceEstimate by rememberSaveable { mutableStateOf(task.priceEstimate) }
                     var completed by rememberSaveable { mutableStateOf(task.completed) }
                     var confirmingDeletion by rememberSaveable { mutableStateOf(false) }
-                    val selectedArea = areas.firstOrNull { it.id.toString() == selectedAreaId }
+                    val areaId = selectedAreaId?.let { Id.fromString<Area>(it) } ?: task.areaId
 
                     OutlinedTextField(
                         value = title,
@@ -86,16 +97,10 @@ private fun EditTaskScreenContent(
                     )
                     TaskAreaPicker(
                         areas = areas,
-                        selectedArea = selectedArea,
-                        creatingArea = creatingArea,
-                        areaName = areaName,
+                        selectedAreaId = areaId,
                         enabled = editing,
-                        onSelectArea = {
-                            selectedAreaId = it.id.toString()
-                            creatingArea = false
-                        },
-                        onCreateArea = { creatingArea = true },
-                        onAreaNameChange = { areaName = it },
+                        onSelectArea = onSelectArea,
+                        onCreateArea = onCreateArea,
                     )
                     TaskTimeEstimatePicker(
                         timeEstimateMins = timeEstimateMins,
@@ -127,6 +132,7 @@ private fun EditTaskScreenContent(
                     val errorMessage = when (changeState) {
                         ChangeState.SaveFailed -> R.string.save_task_error
                         ChangeState.DeleteFailed -> R.string.delete_task_error
+                        ChangeState.AreaCreationFailed -> R.string.create_area_error
                         else -> null
                     }
                     if (errorMessage != null) {
@@ -153,19 +159,17 @@ private fun EditTaskScreenContent(
                         TextButton(onClick = onClose, enabled = editing) {
                             Text(stringResource(R.string.cancel))
                         }
-                        val canSave = editing && title.isNotBlank() && (!creatingArea || areaName.isNotBlank())
                         Button(
                             onClick = {
                                 onSaveTask(
                                     title,
-                                    selectedAreaId?.let { Id.fromString<Area>(it) },
+                                    areaId,
                                     completed,
-                                    areaName.takeIf { creatingArea },
                                     timeEstimateMins,
                                     priceEstimate,
                                 )
                             },
-                            enabled = canSave,
+                            enabled = editing && title.isNotBlank(),
                         ) {
                             Text(stringResource(R.string.save_task))
                         }
@@ -211,8 +215,11 @@ private fun EditTaskScreenPreview() {
             taskState = TaskState.Loaded(task),
             changeState = ChangeState.Editing,
             areas = listOf(area),
+            selectedAreaId = null,
             onClose = {},
-            onSaveTask = { _, _, _, _, _, _ -> },
+            onSelectArea = {},
+            onCreateArea = {},
+            onSaveTask = { _, _, _, _, _ -> },
             onDeleteTask = {},
         )
     }
