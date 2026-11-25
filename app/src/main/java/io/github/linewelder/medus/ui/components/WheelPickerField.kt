@@ -51,7 +51,7 @@ fun <T> WheelPickerField(
             text = {
                 Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
                     WheelPicker(
-                        value = value,
+                        value = wheelSelection,
                         values = options,
                         onValueChange = { wheelSelection = it },
                         display = itemDisplay,

@@ -40,7 +40,8 @@ fun <T> WheelPicker(
 
     LaunchedEffect(state) {
         snapshotFlow { state.index }.collect { index ->
-            val pickedValue = currentValues.getOrNull(index) ?: return@collect
+            if (index !in currentValues.indices) return@collect
+            val pickedValue = currentValues[index]
             if (pickedValue != currentValue) currentOnValueChange(pickedValue)
         }
     }
