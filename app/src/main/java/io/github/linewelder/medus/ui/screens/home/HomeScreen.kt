@@ -16,6 +16,7 @@ import io.github.linewelder.medus.core.model.*
 import io.github.linewelder.medus.ui.components.*
 import io.github.linewelder.medus.ui.components.activechecklist.*
 import io.github.linewelder.medus.ui.components.calendar.*
+import io.github.linewelder.medus.ui.navigation.*
 import io.github.linewelder.medus.ui.theme.*
 import io.github.linewelder.medus.util.*
 import kotlinx.datetime.*
@@ -139,33 +140,33 @@ private fun HomeScreenPreview() {
         ),
     )
 
-    val checklist = Checklist(
+    var checklist by remember { mutableStateOf(Checklist(
         id = Id.empty(),
         dateCreated = Instant.fromEpochMilliseconds(0L),
         role = ChecklistRole.Morning,
         items = listOf(
             ChecklistItem(
-                id = Id.empty(),
+                id = Id.dummy(1),
                 title = "Brush teeth",
                 dateCompleted = Instant.fromEpochMilliseconds(0L),
             ),
             ChecklistItem(
-                id = Id.empty(),
+                id = Id.dummy(2),
                 title = "Make bed",
                 dateCompleted = Instant.fromEpochMilliseconds(110L),
             ),
             ChecklistItem(
-                id = Id.empty(),
+                id = Id.dummy(3),
                 title = "Drink water",
                 dateCompleted = null,
             ),
         )
-    )
+    )) }
 
     val completionReset = Instant.fromEpochMilliseconds(100L)
 
     MedusTheme(dynamicColor = false) {
-        ConfettiOverlay {
+        FullScreenPreview(selectedTab = BottomBarTab.Home) {
             HomeScreenContent(
                 onNewTask = { },
                 activeChecklist = checklist,
@@ -175,7 +176,13 @@ private fun HomeScreenPreview() {
                     ActiveChecklistContent(
                         checklist = checklist,
                         completionReset = completionReset,
-                        onCheckedChange = { _, _ -> },
+                        onCheckedChange = { id, checked ->
+                            checklist = checklist.copy(items = checklist.items.map { item ->
+                                if (item.id == id) {
+                                    item.copy(dateCompleted = if (checked) Clock.System.now() else null)
+                                } else item
+                            })
+                        },
                         modifier = modifier,
                     )
                 },

@@ -13,9 +13,11 @@ import androidx.compose.ui.unit.*
 import androidx.hilt.lifecycle.viewmodel.compose.*
 import androidx.lifecycle.compose.*
 import io.github.linewelder.medus.R
-import io.github.linewelder.medus.core.data.repositories.AreaWithTaskCount
+import io.github.linewelder.medus.core.data.repositories.*
 import io.github.linewelder.medus.core.model.*
+import io.github.linewelder.medus.ui.*
 import io.github.linewelder.medus.ui.components.*
+import io.github.linewelder.medus.ui.navigation.*
 import io.github.linewelder.medus.ui.theme.*
 import kotlinx.coroutines.*
 import kotlin.math.*
@@ -166,7 +168,7 @@ private fun AllTasksScreenPreview() {
         uncompletedTaskCount = 2,
     )
 
-    val tasks = listOf(
+    var tasks by remember { mutableStateOf(listOf(
         Task(
             id = Id.dummy(3),
             title = "Pick up groceries",
@@ -181,16 +183,26 @@ private fun AllTasksScreenPreview() {
             dateCompleted = Instant.fromEpochMilliseconds(0),
             areaId = home.area.id,
         ),
-    )
+    )) }
 
     MedusTheme(dynamicColor = false) {
-        ConfettiOverlay {
+        FullScreenPreview(selectedTab = BottomBarTab.Tasks) {
             AllTasksScreenContent(
                 tasks = tasks,
-                areas = listOf(errands, home),
+                areas = listOf(errands, home).map { area ->
+                    area.copy(uncompletedTaskCount = tasks.count {
+                        it.areaId == area.area.id && !it.completed
+                    })
+                },
                 onCreateTask = {},
                 onEditTask = {},
-                onTaskCompletedChange = { _, _ -> },
+                onTaskCompletedChange = { task, checked ->
+                    tasks = tasks.map {
+                        if (it.id == task.id) {
+                            it.copy(dateCompleted = if (checked) Clock.System.now() else null)
+                        } else it
+                    }
+                },
             )
         }
     }
