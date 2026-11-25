@@ -46,7 +46,8 @@ Room entities and shared models.
   saves a new area and its task in the same transaction.
 - Do not repeat entity names in DAOs and Repositories. Do not call a method `findAreaById` in an
   `AreaRepository`, use `findById` instead.
-- Add at least one preview for every screen and component that has its own file.
+- Add at least one preview for every screen and component that has its own file. For component
+  previews set showBackground to true
 
 ### Compose components
 
